@@ -13,20 +13,30 @@ describe("userService", () => {
 
 	const mockUsers: User[] = [
 		{
-			id: 1,
-			name: "Alice",
+			id: "11111111-1111-1111-1111-111111111111",
+			roleId: "22222222-2222-2222-2222-222222222222",
+			roleName: "CUSTOMER",
+			fullName: "Alice",
 			email: "alice@example.com",
-			age: 42,
+			phone: null,
+			isActive: true,
+			lastLoginAt: null,
 			createdAt: new Date(),
 			updatedAt: new Date(),
+			deletedAt: null,
 		},
 		{
-			id: 2,
-			name: "Bob",
+			id: "33333333-3333-3333-3333-333333333333",
+			roleId: "22222222-2222-2222-2222-222222222222",
+			roleName: "CUSTOMER",
+			fullName: "Bob",
 			email: "bob@example.com",
-			age: 21,
+			phone: null,
+			isActive: true,
+			lastLoginAt: null,
 			createdAt: new Date(),
 			updatedAt: new Date(),
+			deletedAt: null,
 		},
 	];
 
@@ -82,7 +92,7 @@ describe("userService", () => {
 	describe("findById", () => {
 		it("returns a user for a valid ID", async () => {
 			// Arrange
-			const testId = 1;
+			const testId = mockUsers[0].id;
 			const mockUser = mockUsers.find((user) => user.id === testId);
 			(userRepositoryInstance.findByIdAsync as Mock).mockReturnValue(mockUser);
 
@@ -98,7 +108,7 @@ describe("userService", () => {
 
 		it("handles errors for findByIdAsync", async () => {
 			// Arrange
-			const testId = 1;
+			const testId = mockUsers[0].id;
 			(userRepositoryInstance.findByIdAsync as Mock).mockRejectedValue(new Error("Database error"));
 
 			// Act
@@ -113,7 +123,7 @@ describe("userService", () => {
 
 		it("returns a not found error for non-existent ID", async () => {
 			// Arrange
-			const testId = 1;
+			const testId = mockUsers[0].id;
 			(userRepositoryInstance.findByIdAsync as Mock).mockReturnValue(null);
 
 			// Act

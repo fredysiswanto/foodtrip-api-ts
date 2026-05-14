@@ -2,12 +2,46 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { prisma } from "@/common/utils/prismaClient";
 
+const TEST_EMAIL = "prisma-client-test@example.com";
+const TEST_FULL_NAME = "Prisma Client Test";
+
+const ensureTestRole = async () => {
+	return prisma.role.upsert({
+		where: { name: "CUSTOMER" },
+		update: {},
+		create: {
+			name: "CUSTOMER",
+			description: "Test customer role",
+		},
+	});
+};
+
 describe("Prisma Client Integration", () => {
 	beforeAll(async () => {
 		await prisma.$connect();
+
+		const role = await ensureTestRole();
+		await prisma.user.upsert({
+			where: { email: TEST_EMAIL },
+			update: {
+				fullName: TEST_FULL_NAME,
+				passwordHash: "test-hash",
+				roleId: role.id,
+				isActive: true,
+				updatedAt: new Date(),
+			},
+			create: {
+				fullName: TEST_FULL_NAME,
+				email: TEST_EMAIL,
+				passwordHash: "test-hash",
+				roleId: role.id,
+				isActive: true,
+			},
+		});
 	});
 
 	afterAll(async () => {
+		await prisma.user.deleteMany({ where: { email: TEST_EMAIL } });
 		await prisma.$disconnect();
 	});
 
@@ -16,23 +50,23 @@ describe("Prisma Client Integration", () => {
 		expect(globalPrisma).toBe(prisma);
 	});
 
-	it("should return seeded user records from the database", async () => {
+	it("should return user records from the database", async () => {
 		const users = await prisma.user.findMany({ take: 5 });
 
 		expect(users.length).toBeGreaterThan(0);
 		expect(users[0]).toMatchObject({
-			id: expect.any(Number),
+			id: expect.any(String),
 			email: expect.any(String),
-			name: expect.any(String),
-			age: expect.any(Number),
+			fullName: expect.any(String),
+			isActive: expect.any(Boolean),
 		});
 	});
 
-	it("should find the seeded Alice user by email", async () => {
-		const alice = await prisma.user.findUnique({ where: { email: "alice@example.com" } });
+	it("should find the test user by email", async () => {
+		const user = await prisma.user.findUnique({ where: { email: TEST_EMAIL } });
 
-		expect(alice).not.toBeNull();
-		expect(alice?.email).toBe("alice@example.com");
-		expect(alice?.name).toBe("Alice");
+		expect(user).not.toBeNull();
+		expect(user?.email).toBe(TEST_EMAIL);
+		expect(user?.fullName).toBe(TEST_FULL_NAME);
 	});
 });

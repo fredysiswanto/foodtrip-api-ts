@@ -11,7 +11,7 @@ export class AuthController {
 	};
 
 	public me: RequestHandler = async (req: Request, res: Response) => {
-		const authPayload = (req as Request & { user?: { userId: number } }).user;
+		const authPayload = (req as Request & { user?: { userId: string } }).user;
 		if (!authPayload) {
 			const serviceResponse = ServiceResponse.failure("Authentication payload missing.", null, 401);
 			return res.status(serviceResponse.statusCode).send(serviceResponse);

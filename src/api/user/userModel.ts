@@ -7,12 +7,17 @@ extendZodWithOpenApi(z);
 
 export type User = z.infer<typeof UserSchema>;
 export const UserSchema = z.object({
-	id: z.number(),
-	name: z.string(),
+	id: z.string().uuid(),
+	roleId: z.string().uuid(),
+	roleName: z.string(),
+	fullName: z.string(),
 	email: z.string().email(),
-	age: z.number(),
+	phone: z.string().nullable(),
+	isActive: z.boolean(),
+	lastLoginAt: z.date().nullable(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
+	deletedAt: z.date().nullable(),
 });
 
 // Input Validation for 'GET users/:id' endpoint

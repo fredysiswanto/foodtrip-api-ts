@@ -12,7 +12,7 @@ export type AuthTokenResponse = {
 };
 
 export type JwtPayload = {
-	userId: number;
+	userId: string;
 	email: string;
 	iat?: number;
 	exp?: number;

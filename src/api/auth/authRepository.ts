@@ -8,9 +8,9 @@ export interface AuthRecord {
 }
 
 const HASH_BYTE_SIZE = 64;
-const salt = "some_random";
+const PASSWORD_SALT = process.env.PASSWORD_SALT || "random_salt_value";
 
-const createPasswordHash = (password: string) => scryptSync(password, salt, HASH_BYTE_SIZE).toString("hex");
+const createPasswordHash = (password: string) => scryptSync(password, PASSWORD_SALT, HASH_BYTE_SIZE).toString("hex");
 
 export class AuthRepository {
 	async findByEmail(email: string): Promise<AuthRecord | null> {
