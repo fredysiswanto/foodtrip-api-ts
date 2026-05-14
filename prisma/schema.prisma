@@ -7,13 +7,350 @@ datasource db {
   provider = "mysql"
 }
 
+enum RoleName {
+  SUPER_ADMIN
+  CUSTOMER
+  DRIVER
+}
+
+enum RestaurantRole {
+  OWNER
+  ADMIN
+  STAFF
+}
+
+enum RestaurantStatus {
+  PENDING
+  APPROVED
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  DELIVERING
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+  EWALLET
+  QRIS
+}
+
+enum DeliveryStatus {
+  PENDING
+  PICKED_UP
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+enum UploadType {
+  avatar
+  restaurant_logo
+  restaurant_banner
+  dish_image
+}
+
+model Role {
+  id          String   @id @default(uuid()) 
+  name        RoleName @unique
+  description String?
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+}
+
 model User {
-  id           Int      @id @default(autoincrement())
-  name         String   @db.VarChar(255)
-  email        String   @unique @db.VarChar(255)
-  age          Int
-  passwordHash String   @db.VarChar(255)
-  salt         String   @db.VarChar(255)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id           String         @id @default(uuid()) 
+  role         Role           @relation(fields: [roleId], references: [id])
+  roleId       String         
+  fullName     String         @db.VarChar(150)
+  email        String         @unique @db.VarChar(150)
+  phone        String?        @db.VarChar(30)
+  passwordHash String         @db.VarChar(255)
+  avatar       Upload?        @relation("AvatarUpload", fields: [avatarId], references: [id])
+  avatarId     String?        
+  isActive     Boolean        @default(true)
+  lastLoginAt  DateTime?
+  restaurants  RestaurantUser[]
+  carts        Cart[]
+  orders       Order[]
+  deliveries   Delivery[]     @relation("DriverDeliveries")
+  refreshTokens RefreshToken[]
+  uploads      Upload[]       @relation("UploadedBy")
+  auditLogs    AuditLog[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
+}
+
+model Restaurant {
+  id             String            @id @default(uuid()) 
+  name           String            @db.VarChar(150)
+  slug           String            @unique @db.VarChar(150)
+  description    String?
+  phone          String?           @db.VarChar(30)
+  email          String?           @db.VarChar(150)
+  address        String
+  city           String?           @db.VarChar(100)
+  province       String?           @db.VarChar(100)
+  postalCode     String?           @db.VarChar(20)
+  latitude       Decimal?          @db.Decimal(10, 7)
+  longitude      Decimal?          @db.Decimal(10, 7)
+  logo           Upload?           @relation("RestaurantLogo", fields: [logoId], references: [id])
+  logoId         String?           
+  banner         Upload?           @relation("RestaurantBanner", fields: [bannerId], references: [id])
+  bannerId       String?           
+  status         RestaurantStatus  @default(PENDING)
+  isOpen         Boolean           @default(false)
+  openTime       DateTime?         @db.Time
+  closeTime      DateTime?         @db.Time
+  rejectedReason String?
+  users          RestaurantUser[]
+  dishes         Dish[]
+  images         RestaurantImage[]
+  carts          Cart[]
+  orders         Order[]
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  deletedAt      DateTime?
+}
+
+model RestaurantUser {
+  id             String         @id @default(uuid()) 
+  restaurant     Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId   String         
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String         
+  restaurantRole RestaurantRole
+  assignedAt     DateTime       @default(now())
+
+  @@unique([restaurantId, userId])
+  @@index([restaurantId])
+  @@index([userId])
+}
+
+model Category {
+  id          String   @id @default(uuid()) 
+  name        String   @db.VarChar(100)
+  slug        String   @unique @db.VarChar(100)
+  description String?
+  dishes      Dish[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  deletedAt   DateTime?
+}
+
+model Dish {
+  id           String        @id @default(uuid()) 
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId String        
+  category     Category      @relation(fields: [categoryId], references: [id])
+  categoryId   String        
+  name         String        @db.VarChar(150)
+  slug         String        @db.VarChar(150)
+  description  String?
+  price        Decimal       @db.Decimal(12, 2)
+  image        Upload?       @relation("DishMainImage", fields: [imageId], references: [id])
+  imageId      String?       @unique
+  stock        Int           @default(0)
+  isAvailable  Boolean       @default(true)
+  isFeatured   Boolean       @default(false)
+  version      Int           @default(0)
+  orderItems   OrderItem[]
+  cartItems    CartItem[]
+  dishImages   DishImage[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+
+  @@unique([restaurantId, slug])
+  @@index([restaurantId])
+  @@index([categoryId])
+  @@index([isAvailable])
+}
+
+model DishImage {
+  id        String   @id @default(uuid()) 
+  dish      Dish     @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  dishId    String   
+  upload    Upload   @relation(fields: [uploadId], references: [id])
+  uploadId  String   
+  createdAt DateTime @default(now())
+
+  @@unique([dishId, uploadId])
+}
+
+model RestaurantImage {
+  id           String     @id @default(uuid()) 
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId String     
+  upload       Upload     @relation(fields: [uploadId], references: [id])
+  uploadId     String     
+  createdAt    DateTime   @default(now())
+
+  @@unique([restaurantId, uploadId])
+}
+
+model Upload {
+  id             String        @id @default(uuid()) 
+  originalName   String        @db.VarChar(255)
+  filename       String        @unique @db.VarChar(255)
+  mimeType       String        @db.VarChar(100)
+  type           UploadType
+  folder         String        @db.VarChar(100)
+  path           String        @db.VarChar(255)
+  size           BigInt
+  uploadedBy     User          @relation("UploadedBy", fields: [uploadedById], references: [id])
+  uploadedById   String        
+  createdAt      DateTime      @default(now())
+
+  avatarUsers       User[]       @relation("AvatarUpload")
+  restaurantLogo  Restaurant[]       @relation("RestaurantLogo")
+  restaurantBanners Restaurant[]       @relation("RestaurantBanner")
+  dishMainImage    Dish?              @relation("DishMainImage")
+  dishImages       DishImage[]
+  restaurantImages RestaurantImage[]
+}
+
+model Cart {
+  id           String     @id @default(uuid()) 
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String     
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String     
+  cartItems    CartItem[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now())
+
+  @@unique([userId, restaurantId])
+  @@index([userId])
+}
+
+model CartItem {
+  id        String   @id @default(uuid()) 
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cartId    String   
+  dish      Dish     @relation(fields: [dishId], references: [id])
+  dishId    String   
+  quantity  Int
+  price     Decimal  @db.Decimal(12, 2)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([cartId])
+}
+
+model Order {
+  id             String        @id @default(uuid()) 
+  orderNo        String        @unique @db.VarChar(50)
+  user           User          @relation(fields: [userId], references: [id])
+  userId         String        
+  restaurant     Restaurant    @relation(fields: [restaurantId], references: [id])
+  restaurantId   String        
+  subtotal       Decimal       @db.Decimal(12, 2)
+  deliveryFee    Decimal       @db.Decimal(12, 2) @default(0)
+  tax            Decimal       @db.Decimal(12, 2) @default(0)
+  total          Decimal       @db.Decimal(12, 2)
+  status         OrderStatus   @default(PENDING)
+  paymentStatus  PaymentStatus @default(UNPAID)
+  paymentMethod  PaymentMethod?
+  customerName   String        @db.VarChar(150)
+  customerPhone  String        @db.VarChar(30)
+  deliveryAddress String       
+  notes          String?
+  orderedAt      DateTime      @default(now())
+  confirmedAt    DateTime?
+  deliveredAt    DateTime?
+  completedAt    DateTime?
+  orderItems     OrderItem[]
+  delivery       Delivery?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
+  deletedAt      DateTime?
+
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([status])
+  @@index([paymentStatus])
+}
+
+model OrderItem {
+  id         String   @id @default(uuid()) 
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId    String   
+  dish       Dish     @relation(fields: [dishId], references: [id])
+  dishId     String   
+  dishName   String   @db.VarChar(150)
+  dishPrice  Decimal  @db.Decimal(12, 2)
+  quantity   Int
+  subtotal   Decimal  @db.Decimal(12, 2)
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  @@index([orderId])
+}
+
+model Delivery {
+  id          String        @id @default(uuid()) 
+  order       Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     String        
+  driver      User          @relation("DriverDeliveries", fields: [driverId], references: [id])
+  driverId    String        
+  status      DeliveryStatus @default(PENDING)
+  startedAt   DateTime?
+  deliveredAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now())
+
+  @@unique([orderId])
+  @@index([driverId])
+  @@index([status])
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid()) 
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String   
+  token      String   @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([token])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) 
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     String?  
+  action     String   @db.VarChar(100)
+  module     String   @db.VarChar(100)
+  entityType String   @db.VarChar(100)
+  entityId   String   
+  oldData    Json?
+  newData    Json?
+  ipAddress  String?  @db.VarChar(100)
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType])
+  @@index([entityId])
 }

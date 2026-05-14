@@ -44,6 +44,10 @@ This repository contains the FoodTrip API, a lightweight Express + TypeScript ba
 
 The project uses `dotenv` with validation via Zod. Copy `.env.template` to `.env` and update values as needed.
 
+## Database design
+
+- `docs/DATABASE_DESIGN.md` — system architecture, schema, and relationship model for multi-restaurant support.
+
 - `NODE_ENV` — `development`, `production`, or `test`
 - `HOST` — hostname for the server (default `localhost`)
 - `PORT` — server port (default `8080`)
