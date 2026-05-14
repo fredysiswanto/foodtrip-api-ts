@@ -1,4 +1,5 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { prisma } from "@/common/utils/prismaClient";
 
 export interface AuthRecord {
 	id: number;
@@ -12,30 +13,19 @@ const HASH_BYTE_SIZE = 64;
 const createPasswordHash = (password: string, salt: string) =>
 	scryptSync(password, salt, HASH_BYTE_SIZE).toString("hex");
 
-const createUserRecord = (id: number, email: string, password: string): AuthRecord => {
-	const salt = randomBytes(16).toString("hex");
-	const passwordHash = createPasswordHash(password, salt);
-
-	return {
-		id,
-		email,
-		passwordHash,
-		salt,
-	};
-};
-
 export class AuthRepository {
-	private users: AuthRecord[];
+	async findByEmail(email: string): Promise<AuthRecord | null> {
+		const user = await prisma.user.findUnique({
+			where: { email },
+			select: {
+				id: true,
+				email: true,
+				passwordHash: true,
+				salt: true,
+			},
+		});
 
-	constructor() {
-		this.users = [
-			createUserRecord(1, "alice@example.com", "Password123!"),
-			createUserRecord(2, "robert@example.com", "Password123!"),
-		];
-	}
-
-	findByEmail(email: string): AuthRecord | null {
-		return this.users.find((record) => record.email.toLowerCase() === email.toLowerCase()) ?? null;
+		return user ? { id: user.id, email: user.email, passwordHash: user.passwordHash, salt: user.salt } : null;
 	}
 
 	verifyPassword(record: AuthRecord, password: string): boolean {

@@ -19,6 +19,8 @@ const envSchema = z.object({
 	JWT_SECRET: z.string().min(8).default("change-this-secret"),
 
 	JWT_EXPIRES_IN: z.string().default("1h"),
+
+	DATABASE_URL: z.string().default("file:./dev.db"),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

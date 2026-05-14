@@ -31,7 +31,7 @@ export class AuthService {
 	}
 
 	async login(email: string, password: string): Promise<ServiceResponse<AuthTokenResponse | null>> {
-		const authRecord = this.authRepository.findByEmail(email);
+		const authRecord = await this.authRepository.findByEmail(email);
 
 		if (!authRecord || !this.authRepository.verifyPassword(authRecord, password)) {
 			return ServiceResponse.failure<AuthTokenResponse | null>(

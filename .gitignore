@@ -24,3 +24,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+/generated/prisma
+
+/generated/prisma
+
+/generated/prisma
+
+/generated/prisma

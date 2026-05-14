@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model employees {
+  id         Int       @id @default(autoincrement())
+  first_name String    @db.VarChar(50)
+  last_name  String    @db.VarChar(50)
+  email      String?   @unique(map: "email") @db.VarChar(100)
+  hire_date  DateTime? @db.Date
+  salary     Decimal?  @db.Decimal(10, 2)
+}

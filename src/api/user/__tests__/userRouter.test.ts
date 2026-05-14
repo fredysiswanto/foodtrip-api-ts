@@ -2,7 +2,6 @@ import { StatusCodes } from "http-status-codes";
 import request from "supertest";
 
 import type { User } from "@/api/user/userModel";
-import { users } from "@/api/user/userRepository";
 import type { ServiceResponse } from "@/common/models/serviceResponse";
 import { app } from "@/server";
 
@@ -27,8 +26,13 @@ describe("User API Endpoints", () => {
 			expect(response.statusCode).toEqual(StatusCodes.OK);
 			expect(responseBody.success).toBeTruthy();
 			expect(responseBody.message).toContain("Users found");
-			expect(responseBody.responseObject.length).toEqual(users.length);
-			// responseBody.responseObject.forEach((user, index) => compareUsers(users[index] as User, user));
+			expect(responseBody.responseObject.length).toBeGreaterThan(0);
+			expect(responseBody.responseObject[0]).toMatchObject({
+				id: expect.any(Number),
+				email: expect.any(String),
+				name: expect.any(String),
+				age: expect.any(Number),
+			});
 		});
 	});
 
@@ -36,7 +40,6 @@ describe("User API Endpoints", () => {
 		it("should return a user for a valid ID", async () => {
 			// Arrange
 			const testId = 1;
-			const expectedUser = users.find((user) => user.id === testId) as User;
 			const token = await loginAsAlice();
 
 			// Act
@@ -47,8 +50,12 @@ describe("User API Endpoints", () => {
 			expect(response.statusCode).toEqual(StatusCodes.OK);
 			expect(responseBody.success).toBeTruthy();
 			expect(responseBody.message).toContain("User found");
-			if (!expectedUser) throw new Error("Invalid test data: expectedUser is undefined");
-			compareUsers(expectedUser, responseBody.responseObject);
+			expect(responseBody.responseObject).toMatchObject({
+				id: testId,
+				email: "alice@example.com",
+				name: "Alice",
+				age: 42,
+			});
 		});
 
 		it("should return a not found error for non-existent ID", async () => {
@@ -83,16 +90,3 @@ describe("User API Endpoints", () => {
 		});
 	});
 });
-
-function compareUsers(mockUser: User, responseUser: User) {
-	if (!mockUser || !responseUser) {
-		throw new Error("Invalid test data: mockUser or responseUser is undefined");
-	}
-
-	expect(responseUser.id).toEqual(mockUser.id);
-	expect(responseUser.name).toEqual(mockUser.name);
-	expect(responseUser.email).toEqual(mockUser.email);
-	expect(responseUser.age).toEqual(mockUser.age);
-	expect(new Date(responseUser.createdAt)).toEqual(mockUser.createdAt);
-	expect(new Date(responseUser.updatedAt)).toEqual(mockUser.updatedAt);
-}
