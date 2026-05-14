@@ -28,7 +28,7 @@ app.use(rateLimiter);
 app.use(requestLogger);
 
 // Routes
-app.use("/health-check", healthCheckRouter);
+app.use("/health", healthCheckRouter);
 app.use("/auth", authRouter);
 app.use("/users", userRouter);
 
