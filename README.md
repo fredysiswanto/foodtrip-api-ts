@@ -1,15 +1,10 @@
-# 🚀 Express TypeScript Boilerplate 2025
-
-[![CI](https://github.com/edwinhern/express-typescript/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/edwinhern/express-typescript-2024/actions/workflows/ci.yml)
-
-```code
-Hey There! 🙌
-🤾 that ⭐️ button if you like this boilerplate.
-```
+# 🚀 FoodTrip API TypeScript
 
 ## 🌟 Introduction
 
-Welcome to Express TypeScript Boilerplate 2025 – a simple and ready-to-use starting point for building backend web services with Express.js and TypeScript.
+Welcome to FoodTrip API TypeScript — a lightweight, production-ready backend built with Express.js and TypeScript.
+
+This project includes health checks, user routes, request validation, Swagger API docs, error handling, logging, and test coverage.
 
 ## 💡 Why We Made This
 
@@ -47,8 +42,8 @@ For a visual guide, watch the [video demo](https://github.com/user-attachments/a
 
 #### Step 1: 🚀 Initial Setup
 
-- Clone the repository: `git clone https://github.com/edwinhern/express-typescript.git`
-- Navigate: `cd express-typescript`
+- Clone the repository: `git clone <YOUR_REPO_URL>`
+- Navigate: `cd foodtrip-api-ts`
 - Install dependencies: `pnpm install`
 
 #### Step 2: ⚙️ Environment Configuration
@@ -61,6 +56,13 @@ For a visual guide, watch the [video demo](https://github.com/user-attachments/a
 - Development Mode: `pnpm start:dev`
 - Building: `pnpm build`
 - Production Mode: Set `NODE_ENV="production"` in `.env` then `pnpm build && pnpm start:prod`
+
+## 📘 Documentation
+
+Detailed project documentation is available in the `docs/` folder:
+
+- `docs/README.md` — project overview and API reference
+- `docs/DEVELOPER_GUIDE.md` — developer setup, project structure, and extension guide
 
 ## 🤝 Feedback and Contributions
 

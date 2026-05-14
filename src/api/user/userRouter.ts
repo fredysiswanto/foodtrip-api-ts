@@ -4,10 +4,13 @@ import { z } from "zod";
 import { GetUserSchema, UserSchema } from "@/api/user/userModel";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { validateRequest } from "@/common/utils/httpHandlers";
+import { authMiddleware } from "@/common/middleware/authMiddleware";
 import { userController } from "./userController";
 
 export const userRegistry = new OpenAPIRegistry();
 export const userRouter: Router = express.Router();
+
+userRouter.use(authMiddleware);
 
 userRegistry.register("User", UserSchema);
 

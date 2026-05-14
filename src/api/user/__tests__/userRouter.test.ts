@@ -6,11 +6,21 @@ import { users } from "@/api/user/userRepository";
 import type { ServiceResponse } from "@/common/models/serviceResponse";
 import { app } from "@/server";
 
+const loginAsAlice = async () => {
+	const response = await request(app)
+		.post("/auth/login")
+		.send({ email: "alice@example.com", password: "Password123!" });
+
+	return response.body.responseObject?.accessToken as string;
+};
+
 describe("User API Endpoints", () => {
 	describe("GET /users", () => {
 		it("should return a list of users", async () => {
+			const token = await loginAsAlice();
+
 			// Act
-			const response = await request(app).get("/users");
+			const response = await request(app).get("/users").set("Authorization", `Bearer ${token}`);
 			const responseBody: ServiceResponse<User[]> = response.body;
 
 			// Assert
@@ -27,9 +37,12 @@ describe("User API Endpoints", () => {
 			// Arrange
 			const testId = 1;
 			const expectedUser = users.find((user) => user.id === testId) as User;
+			const token = await loginAsAlice();
 
 			// Act
-			const response = await request(app).get(`/users/${testId}`);
+			const response = await request(app)
+				.get(`/users/${testId}`)
+				.set("Authorization", `Bearer ${token}`);
 			const responseBody: ServiceResponse<User> = response.body;
 
 			// Assert
@@ -43,9 +56,12 @@ describe("User API Endpoints", () => {
 		it("should return a not found error for non-existent ID", async () => {
 			// Arrange
 			const testId = Number.MAX_SAFE_INTEGER;
+			const token = await loginAsAlice();
 
 			// Act
-			const response = await request(app).get(`/users/${testId}`);
+			const response = await request(app)
+				.get(`/users/${testId}`)
+				.set("Authorization", `Bearer ${token}`);
 			const responseBody: ServiceResponse = response.body;
 
 			// Assert
@@ -56,9 +72,13 @@ describe("User API Endpoints", () => {
 		});
 
 		it("should return a bad request for invalid ID format", async () => {
+			const token = await loginAsAlice();
+
 			// Act
 			const invalidInput = "abc";
-			const response = await request(app).get(`/users/${invalidInput}`);
+			const response = await request(app)
+				.get(`/users/${invalidInput}`)
+				.set("Authorization", `Bearer ${token}`);
 			const responseBody: ServiceResponse = response.body;
 
 			// Assert

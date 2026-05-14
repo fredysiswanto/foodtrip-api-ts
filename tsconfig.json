@@ -4,7 +4,9 @@
     "module": "ESNext",
     "baseUrl": "./src",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["*"],
+      "@/common/*": ["common/*"],
+      "@/api/*": ["api/*"]
     },
     "moduleResolution": "Node",
     "outDir": "dist",
