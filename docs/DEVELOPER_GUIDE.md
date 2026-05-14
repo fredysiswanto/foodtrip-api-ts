@@ -148,6 +148,14 @@ src/api/product/
 - If the app fails on startup, check `.env` against `src/common/utils/envConfig.ts`.
 - If routes do not appear in Swagger, verify the OpenAPI registry registration in the router file.
 - For unexpected behavior, review logs from `pino` and the error handler.
+- If Prisma schema generation or db push fails, verify `prisma.config.ts` and `DATABASE_URL` in your `.env`.
+
+## Prisma integration notes
+
+- Prisma 7 stores connection details in `prisma.config.ts`, not in `schema.prisma`.
+- The app uses a request-safe global Prisma client in `src/common/utils/prismaClient.ts`.
+- The current database is configured with `@prisma/adapter-mariadb` for MySQL-compatible connections.
+- Run `pnpm prisma:generate`, `pnpm prisma:db:push`, and `pnpm prisma:seed` to sync and populate the database.
 
 ## Additional notes
 

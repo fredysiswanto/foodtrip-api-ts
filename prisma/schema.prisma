@@ -7,11 +7,13 @@ datasource db {
   provider = "mysql"
 }
 
-model employees {
-  id         Int       @id @default(autoincrement())
-  first_name String    @db.VarChar(50)
-  last_name  String    @db.VarChar(50)
-  email      String?   @unique(map: "email") @db.VarChar(100)
-  hire_date  DateTime? @db.Date
-  salary     Decimal?  @db.Decimal(10, 2)
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  email        String   @unique @db.VarChar(255)
+  age          Int
+  passwordHash String   @db.VarChar(255)
+  salt         String   @db.VarChar(255)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
