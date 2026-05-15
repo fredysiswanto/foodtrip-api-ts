@@ -43,7 +43,7 @@ class RestaurantController {
 		const { restaurantId } = req.params;
 		const updateData = req.body as Record<string, unknown>;
 
-		const serviceResponse = await restaurantService.update(restaurantId, updateData as any);
+		const serviceResponse = await restaurantService.update(restaurantId, updateData);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 }
