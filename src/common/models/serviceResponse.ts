@@ -1,16 +1,19 @@
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
+import type { PaginationMeta } from "../utils/paginationHelper";
 
 export class ServiceResponse<T = null> {
 	readonly success: boolean;
 	readonly message: string;
 	readonly data: T;
+	meta?: PaginationMeta;
 	readonly statusCode: number;
 
 	private constructor(success: boolean, message: string, responseObject: T, statusCode: number) {
 		this.success = success;
 		this.message = message;
 		this.data = responseObject;
+		this.meta = undefined;
 		this.statusCode = statusCode;
 	}
 
@@ -22,6 +25,16 @@ export class ServiceResponse<T = null> {
 		return new ServiceResponse(false, message, responseObject, statusCode);
 	}
 
+	static paginatedSuccess<T>(
+		message: string,
+		responseObject: T,
+		meta: PaginationMeta,
+		statusCode: number = StatusCodes.OK,
+	) {
+		const serviceResponse = new ServiceResponse(true, message, responseObject, statusCode);
+		serviceResponse.meta = meta;
+		return serviceResponse;
+	}
 	// static fromError<T = null>(
 	// 	error: unknown,
 	// 	defaultMessage = "Internal server error.",
