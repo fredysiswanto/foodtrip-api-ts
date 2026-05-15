@@ -1,23 +1,23 @@
 {
-	"compilerOptions": {
-		"target": "ES2023",
-		"module": "ESNext",
-		"baseUrl": "./src",
-		"paths": {
-			"@/*": ["*"],
-			"@/common/*": ["common/*"],
-			"@/api/*": ["api/*"],
-			"@/generated/*": ["generated/*"]
-		},
-		"moduleResolution": "bundler",
-		"outDir": "dist",
-		"importsNotUsedAsValues": "remove",
-		"strict": true,
-		"esModuleInterop": true,
-		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true,
-		"types": ["vitest/globals"]
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules"]
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@/common/*": ["common/*"],
+      "@/api/*": ["api/*"],
+      "@/generated/*": ["generated/*"]
+    },
+    "moduleResolution": "bundler",
+    "outDir": "dist",
+    "importsNotUsedAsValues": "remove",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["vitest/globals"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

@@ -1,6 +1,6 @@
 import type { User } from "@/api/user/userModel";
 import { prisma } from "@/common/utils/prismaClient";
-import type { Prisma } from "../../../generated/prisma/client";
+import type { Prisma } from "@/generated/prisma/client";
 
 type PrismaUser = Prisma.UserModel;
 

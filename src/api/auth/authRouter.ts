@@ -11,7 +11,7 @@ export const authRouter: Router = express.Router();
 
 authRegistry.registerPath({
 	method: "post",
-	path: "/auth/login",
+	path: "/api/auth/login",
 	tags: ["Auth"],
 	request: {
 		body: {
@@ -28,7 +28,7 @@ authRegistry.registerPath({
 
 authRegistry.registerPath({
 	method: "get",
-	path: "/auth/me",
+	path: "/api/auth/me",
 	tags: ["Auth"],
 	responses: createApiResponse(UserSchema, "Authenticated user"),
 });

@@ -21,6 +21,19 @@ export class ServiceResponse<T = null> {
 	static failure<T>(message: string, responseObject: T, statusCode: number = StatusCodes.BAD_REQUEST) {
 		return new ServiceResponse(false, message, responseObject, statusCode);
 	}
+
+	// static fromError<T = null>(
+	// 	error: unknown,
+	// 	defaultMessage = "Internal server error.",
+	// 	defaultStatusCode = StatusCodes.INTERNAL_SERVER_ERROR,
+	// ) {
+	// 	if (error instanceof Error) {
+	// 		const statusCode = (error as { statusCode?: number }).statusCode ?? defaultStatusCode;
+	// 		return ServiceResponse.failure<T>(error.message || defaultMessage, null as unknown as T, statusCode);
+	// 	}
+
+	// 	return ServiceResponse.failure<T>(defaultMessage, null as unknown as T, defaultStatusCode);
+	// }
 }
 
 export const ServiceResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
