@@ -16,7 +16,7 @@ const createPasswordHash = (password: string) => scryptSync(password, "some_rand
 const loginAsTestUser = async () => {
 	const response = await request(app).post("/auth/login").send({ email: TEST_EMAIL, password: TEST_PASSWORD });
 
-	return response.body.responseObject?.accessToken as string;
+	return response.body.data?.accessToken as string;
 };
 
 describe("User API Endpoints", () => {
@@ -67,8 +67,8 @@ describe("User API Endpoints", () => {
 			expect(response.statusCode).toEqual(StatusCodes.OK);
 			expect(responseBody.success).toBeTruthy();
 			expect(responseBody.message).toContain("Users found");
-			expect(responseBody.responseObject.length).toBeGreaterThan(0);
-			expect(responseBody.responseObject[0]).toMatchObject({
+			expect(responseBody.data.length).toBeGreaterThan(0);
+			expect(responseBody.data[0]).toMatchObject({
 				id: expect.any(String),
 				email: expect.any(String),
 				fullName: expect.any(String),
@@ -88,7 +88,7 @@ describe("User API Endpoints", () => {
 			expect(response.statusCode).toEqual(StatusCodes.OK);
 			expect(responseBody.success).toBeTruthy();
 			expect(responseBody.message).toContain("User found");
-			expect(responseBody.responseObject).toMatchObject({
+			expect(responseBody.data).toMatchObject({
 				id: testUserId,
 				email: TEST_EMAIL,
 				fullName: TEST_FULL_NAME,
@@ -105,7 +105,7 @@ describe("User API Endpoints", () => {
 			expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
 			expect(responseBody.success).toBeFalsy();
 			expect(responseBody.message).toContain("User not found");
-			expect(responseBody.responseObject).toBeNull();
+			expect(responseBody.data).toBeNull();
 		});
 
 		it("should return a bad request for invalid ID format", async () => {
@@ -118,7 +118,7 @@ describe("User API Endpoints", () => {
 			expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(responseBody.success).toBeFalsy();
 			expect(responseBody.message).toContain("Invalid input");
-			expect(responseBody.responseObject).toBeNull();
+			expect(responseBody.data).toBeNull();
 		});
 	});
 });

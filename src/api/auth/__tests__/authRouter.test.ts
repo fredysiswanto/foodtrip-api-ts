@@ -50,9 +50,9 @@ describe("Auth API Endpoints", () => {
 
 			expect(response.statusCode).toEqual(StatusCodes.OK);
 			expect(response.body.success).toBeTruthy();
-			expect(response.body.responseObject).toHaveProperty("accessToken");
-			expect(response.body.responseObject).toHaveProperty("tokenType", "Bearer");
-			expect(response.body.responseObject).toHaveProperty("expiresIn");
+			expect(response.body.data).toHaveProperty("accessToken");
+			expect(response.body.data).toHaveProperty("tokenType", "Bearer");
+			expect(response.body.data).toHaveProperty("expiresIn");
 		});
 
 		it("should reject invalid credentials", async () => {
@@ -68,13 +68,13 @@ describe("Auth API Endpoints", () => {
 		it("should return authenticated user data when a valid token is provided", async () => {
 			const loginResponse = await request(app).post("/auth/login").send({ email: TEST_EMAIL, password: TEST_PASSWORD });
 
-			const token = loginResponse.body.responseObject?.accessToken as string;
+			const token = loginResponse.body.data?.accessToken as string;
 
 			const response = await request(app).get("/auth/me").set("Authorization", `Bearer ${token}`);
 
 			expect(response.statusCode).toEqual(StatusCodes.OK);
 			expect(response.body.success).toBeTruthy();
-			expect(response.body.responseObject).toMatchObject({
+			expect(response.body.data).toMatchObject({
 				email: TEST_EMAIL,
 				fullName: TEST_FULL_NAME,
 			});

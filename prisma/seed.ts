@@ -606,33 +606,7 @@ async function main() {
 		},
 	});
 
-	await prisma.auditLog.createMany({
-		data: [
-			{
-				userId: adminUser.id,
-				action: "CREATE",
-				module: "SEED",
-				entityType: "User",
-				entityId: customerUser.id,
-				oldData: null,
-				newData: { email: customerUser.email, fullName: customerUser.fullName },
-				ipAddress: "127.0.0.1",
-				userAgent: "Seeder/1.0",
-			},
-			{
-				userId: ownerUser.id,
-				action: "ASSIGN",
-				module: "RESTAURANT",
-				entityType: "RestaurantUser",
-				entityId: jimboRestaurant.id,
-				oldData: null,
-				newData: { restaurantRole: "OWNER" },
-				ipAddress: "127.0.0.1",
-				userAgent: "Seeder/1.0",
-			},
-		],
-		skipDuplicates: true,
-	});
+
 
 	console.log("✅ Database seeded with simulation data.");
 }
