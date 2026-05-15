@@ -24,10 +24,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-/generated/prisma
+src/generated/prisma
 
-/generated/prisma
 
-/generated/prisma
-
-/generated/prisma
