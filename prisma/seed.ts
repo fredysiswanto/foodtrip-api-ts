@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { scryptSync } from "node:crypto";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient } from "../src/generated/prisma/client";
 
 const HASH_BYTE_SIZE = 64;
 const PASSWORD_SALT = "some_random";

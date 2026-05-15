@@ -13,7 +13,11 @@ export class RestaurantService {
 			const restaurants = await this.repository.findAll();
 			return ServiceResponse.success("Restaurants found.", restaurants);
 		} catch (error) {
-			return ServiceResponse.failure("Unable to retrieve restaurants.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure(
+				`Unable to retrieve restaurants. ${error instanceof Error ? error.message : "Unknown error"}`,
+				null,
+				StatusCodes.NOT_FOUND,
+			);
 		}
 	}
 
@@ -25,7 +29,11 @@ export class RestaurantService {
 			}
 			return ServiceResponse.success("Restaurant found.", restaurant);
 		} catch (error) {
-			return ServiceResponse.failure("Unable to retrieve restaurant.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure(
+				`Unable to retrieve restaurant. ${error instanceof Error ? error.message : "Unknown error"}`,
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+			);
 		}
 	}
 
@@ -34,7 +42,11 @@ export class RestaurantService {
 			const restaurant = await this.repository.create(data);
 			return ServiceResponse.success("Restaurant created.", restaurant, StatusCodes.CREATED);
 		} catch (error) {
-			return ServiceResponse.failure("Unable to create restaurant.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure(
+				`Unable to create restaurant. ${error instanceof Error ? error.message : "Unknown error"}`,
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+			);
 		}
 	}
 
@@ -43,7 +55,11 @@ export class RestaurantService {
 			const restaurant = await this.repository.update(id, data);
 			return ServiceResponse.success("Restaurant updated.", restaurant);
 		} catch (error) {
-			return ServiceResponse.failure("Unable to update restaurant.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure(
+				`Unable to update restaurant. ${error instanceof Error ? error.message : "Unknown error"}`,
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+			);
 		}
 	}
 }

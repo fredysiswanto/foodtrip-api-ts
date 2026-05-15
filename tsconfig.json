@@ -7,7 +7,7 @@
       "@/*": ["*"],
       "@/common/*": ["common/*"],
       "@/api/*": ["api/*"],
-      "@/generated/": ["generated/*"]
+      "@/generated/*": ["generated/*"]
     },
     "moduleResolution": "bundler",
     "outDir": "dist",
