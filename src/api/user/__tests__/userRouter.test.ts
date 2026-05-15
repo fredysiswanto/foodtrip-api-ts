@@ -14,7 +14,7 @@ const TEST_FULL_NAME = "User Router Test";
 const createPasswordHash = (password: string) => scryptSync(password, "some_random", 64).toString("hex");
 
 const loginAsTestUser = async () => {
-	const response = await request(app).post("/auth/login").send({ email: TEST_EMAIL, password: TEST_PASSWORD });
+	const response = await request(app).post("/api/auth/login").send({ email: TEST_EMAIL, password: TEST_PASSWORD });
 
 	return response.body.data?.accessToken as string;
 };
@@ -61,7 +61,7 @@ describe("User API Endpoints", () => {
 		it("should return a list of users", async () => {
 			const token = await loginAsTestUser();
 
-			const response = await request(app).get("/users").set("Authorization", `Bearer ${token}`);
+			const response = await request(app).get("/api/users").set("Authorization", `Bearer ${token}`);
 			const responseBody: ServiceResponse<User[]> = response.body;
 
 			expect(response.statusCode).toEqual(StatusCodes.OK);
@@ -82,7 +82,7 @@ describe("User API Endpoints", () => {
 		it("should return a user for a valid ID", async () => {
 			const token = await loginAsTestUser();
 
-			const response = await request(app).get(`/users/${testUserId}`).set("Authorization", `Bearer ${token}`);
+			const response = await request(app).get(`/api/users/${testUserId}`).set("Authorization", `Bearer ${token}`);
 			const responseBody: ServiceResponse<User> = response.body;
 
 			expect(response.statusCode).toEqual(StatusCodes.OK);
@@ -99,7 +99,7 @@ describe("User API Endpoints", () => {
 			const token = await loginAsTestUser();
 			const testId = "00000000-0000-0000-0000-000000000000";
 
-			const response = await request(app).get(`/users/${testId}`).set("Authorization", `Bearer ${token}`);
+			const response = await request(app).get(`/api/users/${testId}`).set("Authorization", `Bearer ${token}`);
 			const responseBody: ServiceResponse = response.body;
 
 			expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
@@ -112,7 +112,7 @@ describe("User API Endpoints", () => {
 			const token = await loginAsTestUser();
 			const invalidInput = "abc";
 
-			const response = await request(app).get(`/users/${invalidInput}`).set("Authorization", `Bearer ${token}`);
+			const response = await request(app).get(`/api/users/${invalidInput}`).set("Authorization", `Bearer ${token}`);
 			const responseBody: ServiceResponse = response.body;
 
 			expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);

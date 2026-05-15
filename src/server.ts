@@ -4,6 +4,8 @@ import helmet from "helmet";
 import { pino } from "pino";
 import { authRouter } from "@/api/auth/authRouter";
 import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter";
+import { adminRouter } from "@/api/routes/adminRouter";
+import { clientRouter } from "@/api/routes/clientRouter";
 import { userRouter } from "@/api/user/userRouter";
 import { openAPIRouter } from "@/api-docs/openAPIRouter";
 import errorHandler from "@/common/middleware/errorHandler";
@@ -29,8 +31,10 @@ app.use(requestLogger);
 
 // Routes
 app.use("/health", healthCheckRouter);
-app.use("/auth", authRouter);
-app.use("/users", userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api", clientRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/users", userRouter);
 
 // Swagger UI
 app.use(openAPIRouter);

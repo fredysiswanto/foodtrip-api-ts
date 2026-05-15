@@ -46,7 +46,7 @@ describe("Auth API Endpoints", () => {
 
 	describe("POST /auth/login", () => {
 		it("should return a JWT token for valid credentials", async () => {
-			const response = await request(app).post("/auth/login").send({ email: TEST_EMAIL, password: TEST_PASSWORD });
+			const response = await request(app).post("/api/auth/login").send({ email: TEST_EMAIL, password: TEST_PASSWORD });
 
 			expect(response.statusCode).toEqual(StatusCodes.OK);
 			expect(response.body.success).toBeTruthy();
@@ -56,7 +56,9 @@ describe("Auth API Endpoints", () => {
 		});
 
 		it("should reject invalid credentials", async () => {
-			const response = await request(app).post("/auth/login").send({ email: TEST_EMAIL, password: "wrong-password" });
+			const response = await request(app)
+				.post("/api/auth/login")
+				.send({ email: TEST_EMAIL, password: "wrong-password" });
 
 			expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
 			expect(response.body.success).toBeFalsy();
@@ -66,11 +68,13 @@ describe("Auth API Endpoints", () => {
 
 	describe("GET /auth/me", () => {
 		it("should return authenticated user data when a valid token is provided", async () => {
-			const loginResponse = await request(app).post("/auth/login").send({ email: TEST_EMAIL, password: TEST_PASSWORD });
+			const loginResponse = await request(app)
+				.post("/api/auth/login")
+				.send({ email: TEST_EMAIL, password: TEST_PASSWORD });
 
 			const token = loginResponse.body.data?.accessToken as string;
 
-			const response = await request(app).get("/auth/me").set("Authorization", `Bearer ${token}`);
+			const response = await request(app).get("/api/auth/me").set("Authorization", `Bearer ${token}`);
 
 			expect(response.statusCode).toEqual(StatusCodes.OK);
 			expect(response.body.success).toBeTruthy();
@@ -81,7 +85,7 @@ describe("Auth API Endpoints", () => {
 		});
 
 		it("should reject requests without a valid token", async () => {
-			const response = await request(app).get("/auth/me");
+			const response = await request(app).get("/api/auth/me");
 
 			expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
 			expect(response.body.success).toBeFalsy();
