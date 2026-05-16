@@ -40,6 +40,6 @@ app.use("/api/users", userRouter);
 app.use(openAPIRouter);
 
 // Error handlers
-app.use(errorHandler());
+app.use(...errorHandler());
 
 export { app, logger };

@@ -1,5 +1,7 @@
 import type { Request, RequestHandler, Response } from "express";
-import type { CreateDishInput, UpdateDishInput } from "./dishModel";
+import genericErrorHandler from "@/common/middleware/errorHandler";
+import { validateData } from "@/common/utils/commonValidation";
+import { type CreateDishInput, CreateDishSchema, type UpdateDishInput } from "./dishModel";
 import { dishService } from "./dishServices";
 
 class DishController {
@@ -17,15 +19,28 @@ class DishController {
 
 	public createDish: RequestHandler = async (req: Request, res: Response) => {
 		const data = req.body as CreateDishInput;
-		const serviceResponse = await dishService.create(data);
-		res.status(serviceResponse.statusCode).send(serviceResponse);
+		const isValid = validateData(CreateDishSchema, data);
+
+		if (isValid) {
+			const serviceResponse = await dishService.create(isValid);
+			res.status(serviceResponse.statusCode).send(serviceResponse);
+		} else {
+			res.status(400).send({
+				success: false,
+				message: "Oh No!. Invalid input data!.",
+				data: null,
+			});
+		}
 	};
 
 	public updateDish: RequestHandler = async (req: Request, res: Response) => {
 		const { id } = req.params;
 		const data = req.body as UpdateDishInput;
-		const serviceResponse = await dishService.update(id, data);
-		res.status(serviceResponse.statusCode).send(serviceResponse);
+		const isValid = validateData(CreateDishSchema.partial(), data);
+		if (isValid) {
+			const serviceResponse = await dishService.update(id, data);
+			res.status(serviceResponse.statusCode).send(serviceResponse);
+		}
 	};
 
 	public deleteDish: RequestHandler = async (req: Request, res: Response) => {
