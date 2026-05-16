@@ -8,21 +8,35 @@ extendZodWithOpenApi(z);
 export type Dish = Prisma.DishModel;
 export const DishSchema = z.object({
 	id: z.string().uuid(),
+	restaurantId: z.string().uuid(),
+	categoryId: z.string().uuid(),
+	slug: z.string(),
 	name: z.string(),
 	description: z.string().nullable(),
 	price: z.number().nonnegative(),
-	imageUrl: z.string().url().nullable(),
+	imageId: z.string().uuid().nullable(),
+	stock: z.number().int().nonnegative(),
 	isAvailable: z.boolean(),
+	isFeatured: z.boolean(),
+	version: z.number().int().nonnegative(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
 	deletedAt: z.date().nullable(),
 });
 
 export type CreateDishInput = z.infer<typeof CreateDishSchema>;
+export type UpdateDishInput = z.infer<typeof UpdateDishSchema>;
 export const CreateDishSchema = z.object({
+	restaurantId: z.string().uuid(),
+	categoryId: z.string().uuid(),
+	slug: z.string(),
 	name: z.string(),
 	description: z.string().nullable(),
 	price: z.number().nonnegative(),
-	imageUrl: z.string().url().nullable(),
-	isAvailable: z.boolean().default(false),
+	imageId: z.string().uuid().nullable(),
+	stock: z.number().int().nonnegative().default(0),
+	isAvailable: z.boolean().default(true),
+	isFeatured: z.boolean().default(false),
 });
+
+export const UpdateDishSchema = CreateDishSchema.partial();

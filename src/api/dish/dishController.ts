@@ -1,5 +1,5 @@
 import type { Request, RequestHandler, Response } from "express";
-import type { CreateDishInput } from "./dishModel";
+import type { CreateDishInput, UpdateDishInput } from "./dishModel";
 import { dishService } from "./dishServices";
 
 class DishController {
@@ -16,8 +16,21 @@ class DishController {
 	};
 
 	public createDish: RequestHandler = async (req: Request, res: Response) => {
-		const data: CreateDishInput = req.body;
-		const serviceResponse = await dishService.create(data as any);
+		const data = req.body as CreateDishInput;
+		const serviceResponse = await dishService.create(data);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
+
+	public updateDish: RequestHandler = async (req: Request, res: Response) => {
+		const { id } = req.params;
+		const data = req.body as UpdateDishInput;
+		const serviceResponse = await dishService.update(id, data);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
+
+	public deleteDish: RequestHandler = async (req: Request, res: Response) => {
+		const { id } = req.params;
+		const serviceResponse = await dishService.delete(id);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 }

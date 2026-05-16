@@ -6,7 +6,7 @@ import {
 	type PaginationMeta,
 } from "@/common/utils/paginationHelper";
 import { prisma } from "@/utils/prismaClient";
-import type { CreateDishInput, Dish } from "./dishModel";
+import type { CreateDishInput, Dish, UpdateDishInput } from "./dishModel";
 import type { GetDishesQuery } from "./dishServices";
 
 export class DishRepository {
@@ -33,9 +33,47 @@ export class DishRepository {
 		});
 	}
 
-	async create(data: any): Promise<Dish> {
+	async create(data: CreateDishInput): Promise<Dish> {
 		return prisma.dish.create({
 			data,
+		});
+	}
+
+	async update(id: string, data: UpdateDishInput): Promise<Dish> {
+		return prisma.dish.update({
+			where: { id },
+			data,
+		});
+	}
+
+	async delete(id: string): Promise<Dish> {
+		return prisma.dish.delete({
+			where: { id },
+		});
+	}
+
+	async restaurantExists(id: string): Promise<boolean> {
+		const restaurant = await prisma.restaurant.findUnique({
+			where: { id },
+			select: { id: true },
+		});
+		return Boolean(restaurant);
+	}
+
+	async categoryExists(id: string): Promise<boolean> {
+		const category = await prisma.category.findUnique({
+			where: { id },
+			select: { id: true },
+		});
+		return Boolean(category);
+	}
+
+	async findByRestaurantAndSlug(restaurantId: string, slug: string): Promise<Dish | null> {
+		return prisma.dish.findFirst({
+			where: {
+				restaurantId,
+				slug,
+			},
 		});
 	}
 }

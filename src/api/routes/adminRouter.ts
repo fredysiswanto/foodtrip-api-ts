@@ -1,9 +1,9 @@
-import express from "express";
+import express, { type Router } from "express";
 import { dishController } from "@/api/dish/dishController";
 import { restaurantController } from "@/api/restaurant/restaurantController";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
 
-export const adminRouter = express.Router();
+export const adminRouter: Router = express.Router();
 
 adminRouter.use(adminAuthMiddleware);
 
@@ -14,3 +14,5 @@ adminRouter.patch("/restaurants/:restaurantId", restaurantController.updateResta
 adminRouter.get("/dishes", dishController.getDishes);
 adminRouter.get("/dishes/:id", dishController.getDishById);
 adminRouter.post("/dishes", dishController.createDish);
+adminRouter.patch("/dishes/:id", dishController.updateDish);
+adminRouter.delete("/dishes/:id", dishController.deleteDish);
