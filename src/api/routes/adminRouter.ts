@@ -12,3 +12,5 @@ adminRouter.post("/restaurants", restaurantController.createRestaurant);
 adminRouter.patch("/restaurants/:restaurantId", restaurantController.updateRestaurant);
 
 adminRouter.get("/dishes", dishController.getDishes);
+adminRouter.get("/dishes/:id", dishController.getDishById);
+adminRouter.post("/dishes", dishController.createDish);

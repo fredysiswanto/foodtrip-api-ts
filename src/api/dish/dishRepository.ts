@@ -6,7 +6,7 @@ import {
 	type PaginationMeta,
 } from "@/common/utils/paginationHelper";
 import { prisma } from "@/utils/prismaClient";
-import type { Dish } from "./dishModel";
+import type { CreateDishInput, Dish } from "./dishModel";
 import type { GetDishesQuery } from "./dishServices";
 
 export class DishRepository {
@@ -25,5 +25,17 @@ export class DishRepository {
 		]);
 
 		return createPaginationResponse(dishes, totalItems, page, limit);
+	}
+
+	async findById(id: string): Promise<Dish | null> {
+		return prisma.dish.findUnique({
+			where: { id },
+		});
+	}
+
+	async create(data: any): Promise<Dish> {
+		return prisma.dish.create({
+			data,
+		});
 	}
 }

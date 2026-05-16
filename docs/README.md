@@ -47,6 +47,7 @@ The project uses `dotenv` with validation via Zod. Copy `.env.template` to `.env
 ## Database design
 
 - `docs/DATABASE_DESIGN.md` — system architecture, schema, and relationship model for multi-restaurant support.
+- `docs/PATTENT_GUIDE.md` — implementation pattern guide for controller-service-repository-DTO architecture.
 
 - `NODE_ENV` — `development`, `production`, or `test`
 - `HOST` — hostname for the server (default `localhost`)
@@ -99,7 +100,8 @@ The OpenAPI JSON document is available at:
 ```
 ├── docs
 │   ├── README.md
-│   └── DEVELOPER_GUIDE.md
+│   ├── DEVELOPER_GUIDE.md
+│   └── PATTENT_GUIDE.md
 ├── src
 │   ├── api
 │   │   ├── healthCheck
@@ -116,6 +118,7 @@ The OpenAPI JSON document is available at:
 
 ## Notes
 
-- The API uses a simple in-memory user repository in `src/api/user/userRepository.ts`.
+- Data access is implemented through Prisma-backed repositories such as `src/api/user/userRepository.ts`.
 - Response payloads are standardized using `ServiceResponse`.
+- Follow the controller-service-repository-DTO architecture in `docs/PATTENT_GUIDE.md` when adding new features.
 - Extend the service by adding new routers, controllers, and OpenAPI schemas.

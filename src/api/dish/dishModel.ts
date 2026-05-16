@@ -24,5 +24,5 @@ export const CreateDishSchema = z.object({
 	description: z.string().nullable(),
 	price: z.number().nonnegative(),
 	imageUrl: z.string().url().nullable(),
-	isAvailable: z.boolean(),
+	isAvailable: z.boolean().default(false),
 });
