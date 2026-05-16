@@ -33,6 +33,7 @@ export const CreateDishSchema = z.object({
 	name: z.string(),
 	description: z.string().nullable(),
 	price: z.number().nonnegative(),
+	// price: z.string(),
 	imageId: z.string().uuid().nullable(),
 	stock: z.number().int().nonnegative().default(0),
 	isAvailable: z.boolean().default(true),

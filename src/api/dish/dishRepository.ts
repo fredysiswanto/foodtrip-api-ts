@@ -47,8 +47,9 @@ export class DishRepository {
 	}
 
 	async delete(id: string): Promise<Dish> {
-		return prisma.dish.delete({
+		return prisma.dish.update({
 			where: { id },
+			data: { deletedAt: new Date(), isAvailable: false },
 		});
 	}
 

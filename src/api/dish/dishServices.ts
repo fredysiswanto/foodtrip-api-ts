@@ -150,7 +150,7 @@ export class DishService {
 		}
 	}
 
-	async delete(id: string): Promise<ServiceResponse<Dish | null>> {
+	async delete(id: string): Promise<ServiceResponse<Pick<Dish, "id" | "name" | "deletedAt"> | null>> {
 		try {
 			const existingDish = await this.repository.findById(id);
 			if (!existingDish) {
@@ -158,7 +158,11 @@ export class DishService {
 			}
 
 			const deletedDish = await this.repository.delete(id);
-			return ServiceResponse.success("Dish deleted successfully.", deletedDish);
+			return ServiceResponse.success("Dish deleted successfully.", {
+				id: deletedDish.id,
+				name: deletedDish.name,
+				deletedAt: deletedDish.deletedAt,
+			});
 		} catch (error) {
 			return ServiceResponse.failure(
 				`Unable to delete dish. ${error instanceof Error ? error.message : "Unknown error"}`,

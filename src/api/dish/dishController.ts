@@ -40,6 +40,12 @@ class DishController {
 		if (isValid) {
 			const serviceResponse = await dishService.update(id, data);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
+		} else {
+			res.status(400).send({
+				success: false,
+				message: "Oh No!. Invalid input data!.",
+				data: null,
+			});
 		}
 	};
 
