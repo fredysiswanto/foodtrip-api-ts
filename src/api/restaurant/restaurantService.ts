@@ -1,17 +1,27 @@
 import { StatusCodes } from "http-status-codes";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import type { Prisma } from "@/generated/prisma/client";
-import { type CreateRestaurantData, RestaurantRepository, type UpdateRestaurantData } from "./restaurantRepository";
+import type { CreateRestaurantInput } from "./restaurantModel";
+import { RestaurantRepository, type UpdateRestaurantData } from "./restaurantRepository";
 
 type Restaurant = Prisma.RestaurantModel;
+
+export interface GetRestaurantsQuery {
+	page?: string;
+	limit?: string;
+	search?: string;
+	sortBy?: "name" | "price" | "createdAt";
+	sortOrder?: "asc" | "desc";
+}
 
 export class RestaurantService {
 	private repository = new RestaurantRepository();
 
-	async findAll(): Promise<ServiceResponse<Restaurant[] | null>> {
+	async findAll(query: GetRestaurantsQuery): Promise<ServiceResponse<Restaurant[] | null>> {
 		try {
-			const restaurants = await this.repository.findAll();
-			return ServiceResponse.success("Restaurants found.", restaurants);
+			const { data, meta } = await this.repository.findAll(query);
+
+			return ServiceResponse.paginatedSuccess("Restaurants found.", data, meta);
 		} catch (error) {
 			return ServiceResponse.failure(
 				`Unable to retrieve restaurants. ${error instanceof Error ? error.message : "Unknown error"}`,
@@ -37,7 +47,7 @@ export class RestaurantService {
 		}
 	}
 
-	async create(data: CreateRestaurantData): Promise<ServiceResponse<Restaurant | null>> {
+	async create(data: CreateRestaurantInput): Promise<ServiceResponse<Restaurant | null>> {
 		try {
 			const restaurant = await this.repository.create(data);
 			return ServiceResponse.success("Restaurant created.", restaurant, StatusCodes.CREATED);

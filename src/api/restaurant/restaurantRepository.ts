@@ -1,5 +1,14 @@
+import {
+	buildOrderBy,
+	buildSearch,
+	createPaginationResponse,
+	getPagination,
+	type PaginationMeta,
+} from "@/common/utils/paginationHelper";
 import { prisma } from "@/common/utils/prismaClient";
 import type { Prisma, RestaurantStatus } from "@/generated/prisma/client";
+import type { CreateRestaurantInput } from "./restaurantModel";
+import type { GetRestaurantsQuery } from "./restaurantService";
 
 type Restaurant = Prisma.RestaurantModel;
 
@@ -20,17 +29,28 @@ export type UpdateRestaurantData = Partial<CreateRestaurantData> & {
 };
 
 export class RestaurantRepository {
-	async findAll(): Promise<Restaurant[]> {
-		return prisma.restaurant.findMany({
-			orderBy: { createdAt: "desc" },
-		});
+	async findAll(query: GetRestaurantsQuery): Promise<{ data: Restaurant[]; meta: PaginationMeta }> {
+		const { page, limit, skip } = getPagination(query);
+		const where = buildSearch(query.search, ["name"]);
+		const orderBy = buildOrderBy(query.sortBy, query.sortOrder, ["name", "createdAt"]);
+		const [restaurants, totalItems] = await Promise.all([
+			prisma.restaurant.findMany({
+				where,
+				skip,
+				take: limit,
+				orderBy,
+			}),
+			prisma.restaurant.count(),
+		]);
+
+		return createPaginationResponse(restaurants, totalItems, page, limit);
 	}
 
 	async findById(id: string): Promise<Restaurant | null> {
 		return prisma.restaurant.findUnique({ where: { id } });
 	}
 
-	async create(data: CreateRestaurantData): Promise<Restaurant> {
+	async create(data: CreateRestaurantInput): Promise<Restaurant> {
 		return prisma.restaurant.create({ data });
 	}
 

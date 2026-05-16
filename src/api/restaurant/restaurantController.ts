@@ -1,9 +1,12 @@
 import type { Request, RequestHandler, Response } from "express";
+import { validateData } from "@/common/utils/commonValidation";
+import { type CreateRestaurantInput, CreateRestaurantSchema } from "./restaurantModel";
 import { restaurantService } from "./restaurantService";
 
 class RestaurantController {
 	public getRestaurants: RequestHandler = async (_req: Request, res: Response) => {
-		const serviceResponse = await restaurantService.findAll();
+		const query = _req.query;
+		const serviceResponse = await restaurantService.findAll(query);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
@@ -14,29 +17,19 @@ class RestaurantController {
 	};
 
 	public createRestaurant: RequestHandler = async (req: Request, res: Response) => {
-		const { name, slug, address, city, province, postalCode, email, phone } = req.body as {
-			name: string;
-			slug: string;
-			address: string;
-			city: string;
-			province: string;
-			postalCode: string;
-			email?: string;
-			phone?: string;
-		};
+		const data = req.body as CreateRestaurantInput;
+		const isValid = validateData(CreateRestaurantSchema, data);
 
-		const serviceResponse = await restaurantService.create({
-			name,
-			slug,
-			address,
-			city,
-			province,
-			postalCode,
-			email: email ?? null,
-			phone: phone ?? null,
-		});
-
-		res.status(serviceResponse.statusCode).send(serviceResponse);
+		if (isValid) {
+			const serviceResponse = await restaurantService.create(isValid);
+			res.status(serviceResponse.statusCode).send(serviceResponse);
+		} else {
+			res.status(400).send({
+				success: false,
+				message: "Oh No!. Invalid input data!.",
+				data: null,
+			});
+		}
 	};
 
 	public updateRestaurant: RequestHandler = async (req: Request, res: Response) => {

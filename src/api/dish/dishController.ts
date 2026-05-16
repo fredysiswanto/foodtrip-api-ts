@@ -1,5 +1,4 @@
 import type { Request, RequestHandler, Response } from "express";
-import genericErrorHandler from "@/common/middleware/errorHandler";
 import { validateData } from "@/common/utils/commonValidation";
 import { type CreateDishInput, CreateDishSchema, type UpdateDishInput } from "./dishModel";
 import { dishService } from "./dishServices";
