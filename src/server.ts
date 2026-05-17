@@ -36,6 +36,8 @@ app.use("/api", clientRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/users", userRouter);
 
+app.use("/api/uploads/images", express.static("public/uploads"));
+
 // Swagger UI
 app.use(openAPIRouter);
 

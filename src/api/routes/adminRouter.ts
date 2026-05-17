@@ -2,6 +2,8 @@ import express, { type Router } from "express";
 import { dishController } from "@/api/dish/dishController";
 import { restaurantController } from "@/api/restaurant/restaurantController";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
+import { uploadMiddleware } from "@/common/utils/uploadHelper";
+import { uploadController } from "../upload/uploadController";
 
 export const adminRouter: Router = express.Router();
 
@@ -16,3 +18,8 @@ adminRouter.get("/dishes/:id", dishController.getDishById);
 adminRouter.post("/dishes", dishController.createDish);
 adminRouter.patch("/dishes/:id", dishController.updateDish);
 adminRouter.delete("/dishes/:id", dishController.deleteDish);
+
+adminRouter.post("/uploads", uploadMiddleware.single("file"), uploadController.create);
+adminRouter.get("/uploads", uploadController.findAll);
+adminRouter.get("/uploads/:id", uploadController.findById);
+adminRouter.delete("/uploads/:id", uploadController.delete);
