@@ -57,4 +57,12 @@ export class RestaurantRepository {
 	async update(id: string, data: UpdateRestaurantData): Promise<Restaurant> {
 		return prisma.restaurant.update({ where: { id }, data });
 	}
+
+	async findBySlug(slug: string): Promise<Restaurant | null> {
+		return prisma.restaurant.findFirst({
+			where: {
+				slug,
+			},
+		});
+	}
 }

@@ -119,3 +119,6 @@ We'd love to hear your feedback and suggestions for further improvements. Feel f
 ├── tsconfig.json
 └── vite.config.mts
 ```
+
+note : 
+i'm using this template for my project https://github.com/edwinhern/express-typescript
