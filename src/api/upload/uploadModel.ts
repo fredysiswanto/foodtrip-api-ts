@@ -38,3 +38,11 @@ export const UploadRequestBodySchema = z.object({
 	type: z.nativeEnum(UploadType),
 	file: z.any(),
 });
+
+export interface GetUploadsQuery {
+	page?: string;
+	limit?: string;
+	search?: string;
+	sortBy?: "name" | "price" | "createdAt";
+	sortOrder?: "asc" | "desc";
+}

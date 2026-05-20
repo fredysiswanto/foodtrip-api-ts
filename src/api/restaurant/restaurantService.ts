@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { Prisma } from "@/generated/prisma/client";
-import type { CreateRestaurantInput, UpdateRestaurantInput } from "./restaurantModel";
+import type { CreateRestaurantInput } from "./restaurantModel";
 import { RestaurantRepository, type UpdateRestaurantData } from "./restaurantRepository";
 
 type Restaurant = Prisma.RestaurantModel;

@@ -1,17 +1,20 @@
-import type { Request, Response } from "express";
+import type { Request, RequestHandler, Response } from "express";
 import { validateData } from "@/common/utils/commonValidation";
 import type { UploadType } from "@/generated/prisma/client";
 import type { JwtPayload } from "../auth/authService";
 import { type Upload, UploadRequestBodySchema } from "./uploadModel";
-import { UploadService } from "./uploadServices";
+import { type GetUploadsQuery, UploadService } from "./uploadServices";
 
-export const serializeBigInt = <T>(data: T): T => {
-	return JSON.parse(JSON.stringify(data, (_, value) => (typeof value === "bigint" ? value.toString() : value)));
-};
 class UploadController {
 	private readonly uploadService = new UploadService();
 
-	create = async (req: Request, res: Response): Promise<Response> => {
+	public getUploads: RequestHandler = async (req: Request, res: Response) => {
+		const query = req.query as GetUploadsQuery;
+		const serviceResponse = await this.uploadService.findAll(query);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
+
+	public create = async (req: Request, res: Response) => {
 		const data = req.body as Upload;
 		const isValid = validateData(UploadRequestBodySchema, data);
 
@@ -37,12 +40,8 @@ class UploadController {
 					message: "Unauthorized",
 				});
 			}
-			const upload = await this.uploadService.createUpload(req.file, createdById, req.body.type as UploadType);
-
-			return res.status(201).json({
-				success: true,
-				data: serializeBigInt(upload),
-			});
+			const serviceResponse = await this.uploadService.createUpload(req.file, createdById, req.body.type as UploadType);
+			res.status(serviceResponse.statusCode).send(serviceResponse);
 		} catch (error) {
 			return res.status(500).json({
 				success: false,
@@ -51,59 +50,23 @@ class UploadController {
 		}
 	};
 
-	findAll = async (_: Request, res: Response): Promise<Response> => {
-		try {
-			const uploads = await this.uploadService.getAllUploads();
-
-			return res.status(200).json({
-				success: true,
-				data: serializeBigInt(uploads),
-			});
-		} catch {
-			return res.status(500).json({
-				success: false,
-				message: "Internal server error",
-			});
-		}
+	public getUploadById: RequestHandler = async (req: Request, res: Response) => {
+		const { id } = req.params;
+		const serviceResponse = await this.uploadService.getUploadById(id);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
-	findById = async (req: Request, res: Response): Promise<Response> => {
-		try {
-			const upload = await this.uploadService.getUploadById(req.params.id);
-
-			return res.status(200).json({
-				success: true,
-				data: serializeBigInt(upload),
-			});
-		} catch (error) {
-			return res.status(404).json({
+	public deleteUpload = async (req: Request, res: Response) => {
+		const { id } = req.params;
+		const createdById = (req as Request & { user?: JwtPayload }).user?.userId;
+		if (!createdById) {
+			return res.status(401).json({
 				success: false,
-				message: error instanceof Error ? error.message : "Upload not found",
+				message: "Unauthorized",
 			});
 		}
-	};
-
-	delete = async (req: Request, res: Response): Promise<Response> => {
-		try {
-			// if (!req.user) {
-			// 	return res.status(401).json({
-			// 		success: false,
-			// 		message: "Unauthorized",
-			// 	});
-			// }
-
-			await this.uploadService.deleteUpload(req.params.id);
-
-			return res.status(200).json({
-				success: true,
-				message: "Upload deleted successfully",
-			});
-		} catch (error) {
-			return res.status(400).json({
-				success: false,
-				message: error instanceof Error ? error.message : "Internal server error",
-			});
-		}
+		const serviceResponse = await this.uploadService.deleteUpload(id, createdById);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 }
 

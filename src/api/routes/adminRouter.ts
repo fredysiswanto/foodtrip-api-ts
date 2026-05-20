@@ -20,6 +20,6 @@ adminRouter.patch("/dishes/:id", dishController.updateDish);
 adminRouter.delete("/dishes/:id", dishController.deleteDish);
 
 adminRouter.post("/uploads", uploadMiddleware.single("file"), uploadController.create);
-adminRouter.get("/uploads", uploadController.findAll);
-adminRouter.get("/uploads/:id", uploadController.findById);
-adminRouter.delete("/uploads/:id", uploadController.delete);
+adminRouter.get("/uploads", uploadController.getUploads);
+adminRouter.get("/uploads/:id", uploadController.getUploadById);
+adminRouter.delete("/uploads/:id", uploadController.deleteUpload);
