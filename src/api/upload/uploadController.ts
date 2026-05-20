@@ -15,37 +15,40 @@ class UploadController {
 	};
 
 	public create = async (req: Request, res: Response) => {
-		const data = req.body as Upload;
-		const isValid = validateData(UploadRequestBodySchema, data);
-
-		if (!isValid) {
+		if (!req.file) {
 			return res.status(400).json({
 				success: false,
-				message: "Oh No!. Invalid input data!.",
-				data: null,
+				message: "File is required",
 			});
 		}
+
+		const createdById = (req as Request & { user?: JwtPayload }).user?.userId;
+		if (!createdById) {
+			return res.status(401).json({
+				success: false,
+				message: "Unauthorized",
+			});
+		}
+
 		try {
-			const createdById = (req as Request & { user?: JwtPayload }).user?.userId;
-			if (!req.file) {
+			validateData(UploadRequestBodySchema.pick({ type: true }), {
+				type: req.body.type,
+			});
+
+			const serviceResponse = await this.uploadService.createUpload(req.file, createdById, req.body.type as UploadType);
+
+			return res.status(serviceResponse.statusCode).send(serviceResponse);
+		} catch (error) {
+			if (error instanceof Error) {
 				return res.status(400).json({
 					success: false,
-					message: "File is required",
+					message: JSON.parse(error.message)[0].message || "Invalid request data",
 				});
 			}
 
-			if (!createdById) {
-				return res.status(401).json({
-					success: false,
-					message: "Unauthorized",
-				});
-			}
-			const serviceResponse = await this.uploadService.createUpload(req.file, createdById, req.body.type as UploadType);
-			res.status(serviceResponse.statusCode).send(serviceResponse);
-		} catch (error) {
 			return res.status(500).json({
 				success: false,
-				message: error instanceof Error ? error.message : "Internal server error",
+				message: "Internal server error",
 			});
 		}
 	};

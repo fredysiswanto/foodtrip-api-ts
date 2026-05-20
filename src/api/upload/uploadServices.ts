@@ -9,7 +9,7 @@ export interface GetUploadsQuery {
 	page?: string;
 	limit?: string;
 	search?: string;
-	sortBy?: "name" | "price" | "createdAt";
+	sortBy?: "filename" | "createdAt";
 	sortOrder?: "asc" | "desc";
 }
 

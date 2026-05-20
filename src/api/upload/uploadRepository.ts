@@ -26,8 +26,8 @@ export class UploadRepository {
 
 	async findAll(queryParams: GetUploadsQuery): Promise<{ data: Upload[]; meta: PaginationMeta }> {
 		const { page, limit, skip } = getPagination(queryParams);
-		const where = buildSearch(queryParams.search, ["name"]);
-		const orderBy = buildOrderBy(queryParams.sortBy, queryParams.sortOrder, ["name", "createdAt"]);
+		const where = buildSearch(queryParams.search, ["filename"]);
+		const orderBy = buildOrderBy(queryParams.sortBy, queryParams.sortOrder, ["createdAt"]);
 		const [uploads, totalItems] = await Promise.all([
 			prisma.upload.findMany({
 				where,
@@ -35,20 +35,17 @@ export class UploadRepository {
 				take: limit,
 				orderBy,
 			}),
-			prisma.upload.count(),
+			prisma.upload.count({ where }),
 		]);
 
 		return createPaginationResponse(uploads, totalItems, page, limit);
 	}
 
 	async delete(id: string): Promise<Upload> {
-		const data = await prisma.upload.delete({
+		return await prisma.upload.delete({
 			where: {
 				id,
 			},
 		});
-		console.log(data, "in repository");
-
-		return data;
 	}
 }
