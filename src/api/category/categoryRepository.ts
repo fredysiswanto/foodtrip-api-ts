@@ -9,7 +9,7 @@ class CategoryRepository {
 	}
 
 	async findAll(): Promise<Category[] | null> {
-		return prisma.category.findMany({});
+		return prisma.category.findMany({ where: { deletedAt: null } });
 	}
 
 	async findById(id: string): Promise<Category | null> {

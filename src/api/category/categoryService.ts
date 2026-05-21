@@ -57,7 +57,7 @@ class CategoryService {
 
 	async update(
 		id: string,
-		data: Partial<Pick<Category, "name" | "description" | "slug">>,
+		data: Pick<Category, "name" | "description" | "slug">,
 	): Promise<ServiceResponse<Category | null>> {
 		try {
 			const existingCategoryResponse = await this.findById(id);

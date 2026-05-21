@@ -20,35 +20,55 @@ class CategoryController {
 
 	createCategory: RequestHandler = async (req: Request, res: Response<ServiceResponseType<Category | null>>) => {
 		const data = req.body as CreateCategoryInput;
-		const isValid = validateData(CreateCategorySchema, data);
-
-		if (isValid) {
+		try {
+			const isValid = validateData(CreateCategorySchema, data);
 			const serviceResponse = await categoryService.create(isValid);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
-		} else {
-			res.status(400).send({
+		} catch (error) {
+			if (error instanceof Error) {
+				return res.status(400).json({
+					success: false,
+					message: JSON.parse(error.message)[0].message || "Oh No!. Invalid input data!.",
+					data: null,
+					statusCode: 400,
+				});
+			}
+
+			return res.status(500).json({
 				success: false,
-				message: "Oh No!. Invalid input data!.",
+				message: "Internal server error",
 				data: null,
-				statusCode: 400,
+				statusCode: 500,
 			});
 		}
 	};
 
 	updateCategory: RequestHandler = async (req: Request, res: Response<ServiceResponseType<Category | null>>) => {
 		const { id } = req.params;
-		const data = req.body as Partial<CreateCategoryInput>;
-		const isValid = validateData(CreateCategorySchema.partial(), data);
 
-		if (isValid) {
-			const serviceResponse = await categoryService.update(id, isValid);
+		try {
+			const data = req.body as Partial<CreateCategoryInput>;
+			const isValid = validateData(CreateCategorySchema.partial(), data);
+			const serviceResponse = await categoryService.update(
+				id,
+				isValid as Pick<Category, "name" | "description" | "slug">,
+			);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
-		} else {
-			res.status(400).send({
+		} catch (error) {
+			if (error instanceof Error) {
+				return res.status(400).json({
+					success: false,
+					message: JSON.parse(error.message)[0].message || "Oh No!. Invalid input data!.",
+					data: null,
+					statusCode: 400,
+				});
+			}
+
+			return res.status(500).json({
 				success: false,
-				message: "Oh No!. Invalid input data!.",
+				message: "Internal server error",
 				data: null,
-				statusCode: 400,
+				statusCode: 500,
 			});
 		}
 	};
