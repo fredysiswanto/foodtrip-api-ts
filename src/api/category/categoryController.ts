@@ -2,7 +2,7 @@ import type { Request, RequestHandler, Response } from "express";
 import type { ServiceResponseType } from "@/common/models/serviceResponse";
 import { validateData } from "@/common/utils/commonValidation";
 import type { Category } from "@/generated/prisma/browser";
-import { type CreateCategoryInput, CreateCategorySchema } from "./category.dto";
+import { type CreateCategoryInput, CreateCategorySchema, UpdateCategorySchema } from "./category.dto";
 import { categoryService } from "./categoryService";
 
 class CategoryController {
@@ -21,8 +21,8 @@ class CategoryController {
 	createCategory: RequestHandler = async (req: Request, res: Response<ServiceResponseType<Category | null>>) => {
 		const data = req.body as CreateCategoryInput;
 		try {
-			const isValid = validateData(CreateCategorySchema, data);
-			const serviceResponse = await categoryService.create(isValid);
+			validateData(CreateCategorySchema, data);
+			const serviceResponse = await categoryService.create(data as Pick<Category, "name" | "description" | "slug">);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
 		} catch (error) {
 			if (error instanceof Error) {
@@ -45,14 +45,11 @@ class CategoryController {
 
 	updateCategory: RequestHandler = async (req: Request, res: Response<ServiceResponseType<Category | null>>) => {
 		const { id } = req.params;
+		const data = req.body as Partial<CreateCategoryInput>;
 
 		try {
-			const data = req.body as Partial<CreateCategoryInput>;
-			const isValid = validateData(CreateCategorySchema.partial(), data);
-			const serviceResponse = await categoryService.update(
-				id,
-				isValid as Pick<Category, "name" | "description" | "slug">,
-			);
+			validateData(UpdateCategorySchema, data);
+			const serviceResponse = await categoryService.update(id, data as Pick<Category, "name" | "description" | "slug">);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
 		} catch (error) {
 			if (error instanceof Error) {

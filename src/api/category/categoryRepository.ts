@@ -4,7 +4,7 @@ import type { Category } from "./category.dto";
 class CategoryRepository {
 	async findBySlug(slug: string): Promise<Category | null> {
 		return prisma.category.findUnique({
-			where: { slug },
+			where: { slug, deletedAt: null },
 		});
 	}
 
@@ -14,7 +14,7 @@ class CategoryRepository {
 
 	async findById(id: string): Promise<Category | null> {
 		return prisma.category.findUnique({
-			where: { id },
+			where: { id, deletedAt: null },
 		});
 	}
 
@@ -26,14 +26,14 @@ class CategoryRepository {
 
 	async update(id: string, data: Partial<Pick<Category, "name" | "description" | "slug">>): Promise<Category> {
 		return prisma.category.update({
-			where: { id },
+			where: { id, deletedAt: null },
 			data,
 		});
 	}
 
 	async delete(id: string): Promise<void> {
 		await prisma.category.update({
-			where: { id },
+			where: { id, deletedAt: null },
 			data: { deletedAt: new Date() },
 		});
 	}

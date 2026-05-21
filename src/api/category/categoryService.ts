@@ -16,7 +16,7 @@ class CategoryService {
 			return ServiceResponse.failure(
 				`Unable to retrieve categories. ${error instanceof Error ? error.message : "Unknown error"}`,
 				null,
-				StatusCodes.NOT_FOUND,
+				StatusCodes.INTERNAL_SERVER_ERROR,
 			);
 		}
 	}

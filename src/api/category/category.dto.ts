@@ -10,7 +10,7 @@ export const CategorySchema = z.object({
 	id: z.string().uuid(),
 	slug: z.string(),
 	name: z.string(),
-	description: z.string().nullable(),
+	description: z.string().nullable().optional(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
 	deletedAt: z.date().nullable(),
