@@ -13,7 +13,7 @@ export class CategoryRepository {
 	}
 
 	async findById(id: string): Promise<Category | null> {
-		return prisma.category.findUnique({
+		return prisma.category.findFirst({
 			where: { id },
 		});
 	}
