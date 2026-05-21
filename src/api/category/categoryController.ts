@@ -3,18 +3,19 @@ import type { ServiceResponseType } from "@/common/models/serviceResponse";
 import { validateData } from "@/common/utils/commonValidation";
 import type { Category } from "@/generated/prisma/browser";
 import { type CreateCategoryInput, CreateCategorySchema, UpdateCategorySchema } from "./category.dto";
-import { categoryService } from "./categoryService";
+import { CategoryService } from "./categoryService";
 
-class CategoryController {
+export class CategoryController {
+	private readonly categoryService = new CategoryService();
 	// Responds with a ServiceResponse containing an array of Category
 	getCategories: RequestHandler = async (_req: Request, res: Response<ServiceResponseType<Category[] | null>>) => {
-		const serviceResponse = await categoryService.findAll();
+		const serviceResponse = await this.categoryService.findAll();
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
 	getCategoryById: RequestHandler = async (req: Request, res: Response<ServiceResponseType<Category | null>>) => {
 		const { id } = req.params;
-		const serviceResponse = await categoryService.findById(id);
+		const serviceResponse = await this.categoryService.findById(id);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
@@ -22,7 +23,9 @@ class CategoryController {
 		const data = req.body as CreateCategoryInput;
 		try {
 			validateData(CreateCategorySchema, data);
-			const serviceResponse = await categoryService.create(data as Pick<Category, "name" | "description" | "slug">);
+			const serviceResponse = await this.categoryService.create(
+				data as Pick<Category, "name" | "description" | "slug">,
+			);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
 		} catch (error) {
 			if (error instanceof Error) {
@@ -49,7 +52,10 @@ class CategoryController {
 
 		try {
 			validateData(UpdateCategorySchema, data);
-			const serviceResponse = await categoryService.update(id, data as Pick<Category, "name" | "description" | "slug">);
+			const serviceResponse = await this.categoryService.update(
+				id,
+				data as Pick<Category, "name" | "description" | "slug">,
+			);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
 		} catch (error) {
 			if (error instanceof Error) {
@@ -72,7 +78,7 @@ class CategoryController {
 
 	deleteCategory: RequestHandler = async (req: Request, res: Response<ServiceResponseType<null>>) => {
 		const { id } = req.params;
-		const serviceResponse = await categoryService.delete(id);
+		const serviceResponse = await this.categoryService.delete(id);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 }

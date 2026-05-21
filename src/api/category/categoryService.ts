@@ -1,16 +1,17 @@
 import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import type { Category } from "@/generated/prisma/browser";
-import { categoryRepository } from "./categoryRepository";
+import { CategoryRepository } from "./categoryRepository";
 
-class CategoryService {
+export class CategoryService {
+	private categoryRepository = new CategoryRepository();
 	private isSlugUnique = async (slug: string): Promise<boolean> => {
-		const existingCategory = await categoryRepository.findBySlug(slug);
+		const existingCategory = await this.categoryRepository.findBySlug(slug);
 		return !existingCategory;
 	};
 	async findAll(): Promise<ServiceResponse<Category[] | null>> {
 		try {
-			const data = await categoryRepository.findAll();
+			const data = await this.categoryRepository.findAll();
 			return ServiceResponse.success("Categories found.", data);
 		} catch (error) {
 			return ServiceResponse.failure(
@@ -23,7 +24,7 @@ class CategoryService {
 
 	async findById(id: string): Promise<ServiceResponse<Category | null>> {
 		try {
-			const data = await categoryRepository.findById(id);
+			const data = await this.categoryRepository.findById(id);
 			if (!data) {
 				return ServiceResponse.failure("Category not found.", null, StatusCodes.NOT_FOUND);
 			}
@@ -44,7 +45,7 @@ class CategoryService {
 		}
 
 		try {
-			const createdCategory = await categoryRepository.create(data);
+			const createdCategory = await this.categoryRepository.create(data);
 			return ServiceResponse.success("Category created successfully.", createdCategory, StatusCodes.CREATED);
 		} catch (error) {
 			return ServiceResponse.failure(
@@ -75,7 +76,7 @@ class CategoryService {
 			}
 
 			const updatedData = { ...existingCategory, ...data };
-			const updatedCategory = await categoryRepository.update(id, updatedData);
+			const updatedCategory = await this.categoryRepository.update(id, updatedData);
 			return ServiceResponse.success("Category updated successfully.", updatedCategory);
 		} catch (error) {
 			return ServiceResponse.failure(
@@ -93,7 +94,7 @@ class CategoryService {
 				return ServiceResponse.failure("Category not found.", null, StatusCodes.NOT_FOUND);
 			}
 
-			await categoryRepository.delete(id);
+			await this.categoryRepository.delete(id);
 			return ServiceResponse.success("Category deleted successfully.", null);
 		} catch (error) {
 			return ServiceResponse.failure(
@@ -104,5 +105,3 @@ class CategoryService {
 		}
 	}
 }
-
-export const categoryService = new CategoryService();
