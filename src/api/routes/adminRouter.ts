@@ -3,6 +3,7 @@ import { dishController } from "@/api/dish/dishController";
 import { restaurantController } from "@/api/restaurant/restaurantController";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
 import { uploadMiddleware } from "@/common/utils/uploadHelper";
+import { categoryController } from "../category/categoryController";
 import { uploadController } from "../upload/uploadController";
 
 export const adminRouter: Router = express.Router();
@@ -23,3 +24,9 @@ adminRouter.post("/uploads", uploadMiddleware.single("file"), uploadController.c
 adminRouter.get("/uploads", uploadController.getUploads);
 adminRouter.get("/uploads/:id", uploadController.getUploadById);
 adminRouter.delete("/uploads/:id", uploadController.deleteUpload);
+
+adminRouter.get("/categories", categoryController.getCategories);
+adminRouter.get("/categories/:id", categoryController.getCategoryById);
+adminRouter.post("/categories", categoryController.createCategory);
+adminRouter.patch("/categories/:id", categoryController.updateCategory);
+adminRouter.delete("/categories/:id", categoryController.deleteCategory);

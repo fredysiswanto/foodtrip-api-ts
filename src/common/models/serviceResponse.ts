@@ -2,18 +2,29 @@ import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import type { PaginationMeta } from "../utils/paginationHelper";
 
+export type ServiceResponseType<T = null> = {
+	success: boolean;
+	message: string;
+	data: T;
+	meta?: PaginationMeta;
+	statusCode: number;
+	error?: string;
+};
+
 export class ServiceResponse<T = null> {
 	readonly success: boolean;
 	readonly message: string;
 	readonly data: T;
 	meta?: PaginationMeta;
 	readonly statusCode: number;
+	readonly error?: string;
 
-	private constructor(success: boolean, message: string, responseObject: T, statusCode: number) {
+	private constructor(success: boolean, message: string, responseObject: T, statusCode: number, error?: string) {
 		this.success = success;
 		this.message = message;
 		this.data = responseObject;
 		this.meta = undefined;
+		this.error = error;
 		this.statusCode = statusCode;
 	}
 
@@ -21,8 +32,8 @@ export class ServiceResponse<T = null> {
 		return new ServiceResponse(true, message, responseObject, statusCode);
 	}
 
-	static failure<T>(message: string, responseObject: T, statusCode: number = StatusCodes.BAD_REQUEST) {
-		return new ServiceResponse(false, message, responseObject, statusCode);
+	static failure<T>(message: string, responseObject: T, statusCode: number = StatusCodes.BAD_REQUEST, error?: string) {
+		return new ServiceResponse(false, message, responseObject, statusCode, error);
 	}
 
 	static paginatedSuccess<T>(
@@ -55,4 +66,15 @@ export const ServiceResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
 		message: z.string(),
 		data: dataSchema.optional(),
 		statusCode: z.number(),
+		error: z.string().optional(),
+		meta: z
+			.object({
+				page: z.number(),
+				limit: z.number(),
+				totalItems: z.number(),
+				totalPages: z.number(),
+				previousPage: z.number().nullable(),
+				nextPage: z.number().nullable(),
+			})
+			.optional(),
 	});
