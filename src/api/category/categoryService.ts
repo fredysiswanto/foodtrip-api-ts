@@ -158,11 +158,11 @@ export class CategoryService {
 
 			const createdCategory = await this.categoryRepository.create(data);
 			return ServiceResponse.success("Category created successfully.", createdCategory, StatusCodes.CREATED);
-		} catch (error: any) {
+		} catch (error) {
 			// Handling database race conditions (Prisma unique constraint code: P2002)
-			if (error?.code === "P2002" || error?.message?.includes("unique constraint")) {
-				return ServiceResponse.failure("Category with this slug already exists.", null, StatusCodes.CONFLICT);
-			}
+			// if (error?.code === "P2002" || error?.message?.includes("unique constraint")) {
+			// 	return ServiceResponse.failure("Category with this slug already exists.", null, StatusCodes.CONFLICT, );
+			// }
 			return ServiceResponse.failure(
 				`Unable to create category: ${error instanceof Error ? error.message : "Unknown error"}`,
 				null,
@@ -191,10 +191,10 @@ export class CategoryService {
 
 			const updatedCategory = await this.categoryRepository.update(id, data);
 			return ServiceResponse.success("Category updated successfully.", updatedCategory);
-		} catch (error: any) {
-			if (error?.code === "P2002" || error?.message?.includes("unique constraint")) {
-				return ServiceResponse.failure("Category with this slug already exists.", null, StatusCodes.CONFLICT);
-			}
+		} catch (error) {
+			// if (error?.code === "P2002" || error?.message?.includes("unique constraint")) {
+			// 	return ServiceResponse.failure("Category with this slug already exists.", null, StatusCodes.CONFLICT);
+			// }
 			return ServiceResponse.failure(
 				`Unable to update category: ${error instanceof Error ? error.message : "Unknown error"}`,
 				null,
