@@ -1,4 +1,4 @@
-import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
+import { StatusCodes } from "http-status-codes";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { LocalStorageService } from "@/common/utils/localStorageHandel";
 import type { Prisma, UploadType } from "@/generated/prisma/client";
