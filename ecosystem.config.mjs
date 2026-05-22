@@ -12,8 +12,8 @@ export default {
       env: {
         NODE_ENV: "production",
       },
-      error_file: "./logs/v2/pm2-error.log",
-      out_file: "./logs/v2/pm2-out.log",
+      error_file: "./logs/pm2-error.log",
+      out_file: "./logs/pm2-out.log",
       merge_logs: true,
       log_date_format: "YYYY-MM-DD HH:mm Z",
       max_memory_restart: "500M",
