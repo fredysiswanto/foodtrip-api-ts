@@ -2,7 +2,7 @@ export default {
   apps: [
     {
       name: "foodtrip-api-ts",
-      script: "./dist/index.js",
+      script: path.join(__dirname, "dist/index.js"),
       //   cwd: "./",
       instances: "1",
       exec_mode: "fork",
