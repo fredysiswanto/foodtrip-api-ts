@@ -1,7 +1,6 @@
 import express, { type Router } from "express";
-import { restaurantController } from "@/api/restaurant/restaurantController";
+import { restaurantRouter } from "@/api/restaurant/restaurantRouter";
 
 export const clientRouter: Router = express.Router();
 
-clientRouter.get("/restaurants", restaurantController.getRestaurants);
-clientRouter.get("/restaurants/:restaurantId", restaurantController.getRestaurantById);
+clientRouter.use("/restaurants", restaurantRouter);
