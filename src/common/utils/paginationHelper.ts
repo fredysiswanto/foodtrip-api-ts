@@ -82,6 +82,12 @@ export function createPaginationResponse<T>(
 
 /**
  * Build Prisma orderBy safely
+ * @param sortBy
+ * @param sortOrder
+ * @param allowedFields
+ *
+ * example usage:
+ * const orderBy = buildOrderBy(queryParams.sortBy, queryParams.sortOrder, ["name", "createdAt"]);
  */
 export function buildOrderBy<T extends string>(
 	sortBy: T | undefined,

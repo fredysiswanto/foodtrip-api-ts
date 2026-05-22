@@ -82,6 +82,13 @@ When adding a new feature:
 2. Add controllers for endpoint handlers.
 3. Implement service methods for the core logic.
 4. Use a repository to encapsulate data access.
+5. Follow the Controller-Service-Repository-DTO pattern described in `docs/PATTENT_GUIDE.md`.
+
+### Architecture patterns
+
+- The canonical architecture pattern for this project is defined in `docs/PATTENT_GUIDE.md`.
+- Follow the Controller-Service-Repository-DTO pattern for new routes, resources, and feature development.
+- The pattern guide includes layer responsibilities, implementation rules, and a code skeleton for new modules.
 
 ### Request validation
 

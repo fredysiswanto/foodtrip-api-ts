@@ -6,7 +6,7 @@ import {
 	type PaginationMeta,
 } from "@/common/utils/paginationHelper";
 import { prisma } from "@/utils/prismaClient";
-import type { Dish } from "./dishModel";
+import type { CreateDishInput, Dish, UpdateDishInput } from "./dishModel";
 import type { GetDishesQuery } from "./dishServices";
 
 export class DishRepository {
@@ -25,5 +25,56 @@ export class DishRepository {
 		]);
 
 		return createPaginationResponse(dishes, totalItems, page, limit);
+	}
+
+	async findById(id: string): Promise<Dish | null> {
+		return prisma.dish.findUnique({
+			where: { id },
+		});
+	}
+
+	async create(data: CreateDishInput): Promise<Dish> {
+		return prisma.dish.create({
+			data,
+		});
+	}
+
+	async update(id: string, data: UpdateDishInput): Promise<Dish> {
+		return prisma.dish.update({
+			where: { id },
+			data,
+		});
+	}
+
+	async delete(id: string): Promise<Dish> {
+		return prisma.dish.update({
+			where: { id },
+			data: { deletedAt: new Date(), isAvailable: false },
+		});
+	}
+
+	async restaurantExists(id: string): Promise<boolean> {
+		const restaurant = await prisma.restaurant.findUnique({
+			where: { id },
+			select: { id: true },
+		});
+		return Boolean(restaurant);
+	}
+
+	async categoryExists(id: string): Promise<boolean> {
+		const category = await prisma.category.findUnique({
+			where: { id },
+			select: { id: true },
+		});
+		return Boolean(category);
+	}
+
+	async findByRestaurantAndSlug(restaurantId: string, slug: string): Promise<Dish | null> {
+		return prisma.dish.findFirst({
+			where: {
+				restaurantId,
+				slug,
+			},
+		});
 	}
 }

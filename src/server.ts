@@ -36,10 +36,12 @@ app.use("/api", clientRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/users", userRouter);
 
+app.use("/api/uploads/images", express.static("public/uploads"));
+
 // Swagger UI
 app.use(openAPIRouter);
 
 // Error handlers
-app.use(errorHandler());
+app.use(...errorHandler());
 
 export { app, logger };
