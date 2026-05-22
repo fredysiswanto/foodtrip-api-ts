@@ -2,8 +2,7 @@ export default {
   apps: [
     {
       name: "foodtrip-api-ts",
-      cwd: "./",
-      script: "dist/index.js",
+      script: "./dist/index.js",
       instances: "1",
       exec_mode: "fork",
       autorestart: true,
