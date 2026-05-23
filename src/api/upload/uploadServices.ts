@@ -21,7 +21,9 @@ export class UploadService {
 
 	private readonly storageProvider = new LocalStorageService();
 
-	async findAll(query: GetUploadsQuery): Promise<ServiceResponse<Upload[] | null>> {
+	async findAll(
+		query: GetUploadsQuery,
+	): Promise<ServiceResponse<Pick<Upload, "id" | "filename" | "type" | "createdAt" | "size">[] | null>> {
 		try {
 			const { data, meta } = await this.uploadRepository.findAll(query);
 			const serializedData = serializeBigInt(data);

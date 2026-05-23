@@ -31,4 +31,4 @@ userRegistry.registerPath({
 });
 
 userRouter.get("/", userController.getUsers);
-userRouter.get("/users/:id", validateRequest(GetUserSchema), userController.getUser);
+userRouter.get("/:id", validateRequest(GetUserSchema), userController.getUser);
