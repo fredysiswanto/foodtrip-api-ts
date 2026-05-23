@@ -10,38 +10,31 @@ import { validateRequest } from "@/common/utils/httpHandlers";
 
 export const restaurantRegistry = new OpenAPIRegistry();
 export const restaurantRouter: Router = express.Router();
+const basePath = "/api/admin/restaurants";
 
 restaurantRegistry.register("Restaurant", RestaurantSchema);
-
+// Swagger docs Generated
 // GET /restaurants - Get all restaurants
 restaurantRegistry.registerPath({
 	method: "get",
-	path: "/api/restaurants",
+	path: basePath,
 	tags: ["Restaurant"],
 	responses: createApiResponse(z.array(RestaurantSchema), "Restaurants retrieved successfully"),
 });
 
-restaurantRouter.get("/", restaurantController.getRestaurants);
-
 // GET /restaurants/:restaurantId - Get restaurant by ID
 restaurantRegistry.registerPath({
 	method: "get",
-	path: "/api/restaurants/{restaurantId}",
+	path: `${basePath}/{restaurantId}`,
 	tags: ["Restaurant"],
 	request: { params: z.object({ restaurantId: commonValidations.id }) },
 	responses: createApiResponse(RestaurantSchema, "Restaurant retrieved successfully"),
 });
 
-restaurantRouter.get(
-	"/:restaurantId",
-	validateRequest(z.object({ params: z.object({ restaurantId: commonValidations.id }) })),
-	restaurantController.getRestaurantById,
-);
-
 // POST /restaurants - Create new restaurant (Admin only)
 restaurantRegistry.registerPath({
 	method: "post",
-	path: "/api/restaurants",
+	path: basePath,
 	tags: ["Restaurant"],
 	request: {
 		body: {
@@ -56,17 +49,10 @@ restaurantRegistry.registerPath({
 	responses: createApiResponse(RestaurantSchema, "Restaurant created successfully"),
 });
 
-restaurantRouter.post(
-	"/",
-	adminAuthMiddleware,
-	validateRequest(z.object({ body: CreateRestaurantSchema })),
-	restaurantController.createRestaurant,
-);
-
 // PATCH /restaurants/:restaurantId - Update restaurant (Admin only)
 restaurantRegistry.registerPath({
 	method: "patch",
-	path: "/api/restaurants/{restaurantId}",
+	path: `${basePath}/{restaurantId}`,
 	tags: ["Restaurant"],
 	request: {
 		params: z.object({ restaurantId: commonValidations.id }),
@@ -82,6 +68,20 @@ restaurantRegistry.registerPath({
 	responses: createApiResponse(RestaurantSchema, "Restaurant updated successfully"),
 });
 
+restaurantRouter.get("/", restaurantController.getRestaurants);
+
+restaurantRouter.get(
+	"/:restaurantId",
+	validateRequest(z.object({ params: z.object({ restaurantId: commonValidations.id }) })),
+	restaurantController.getRestaurantById,
+);
+
+restaurantRouter.post(
+	"/",
+	adminAuthMiddleware,
+	validateRequest(z.object({ body: CreateRestaurantSchema })),
+	restaurantController.createRestaurant,
+);
 restaurantRouter.patch(
 	"/:restaurantId",
 	adminAuthMiddleware,

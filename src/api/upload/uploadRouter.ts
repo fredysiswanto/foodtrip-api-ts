@@ -17,7 +17,7 @@ uploadRegistry.register("Upload", UploadSchema);
 // POST /uploads - Upload new file (Admin only)
 uploadRegistry.registerPath({
 	method: "post",
-	path: "/api/uploads",
+	path: "/api/admin/uploads",
 	tags: ["Upload"],
 	request: {
 		body: {
@@ -35,41 +35,39 @@ uploadRegistry.registerPath({
 	responses: createApiResponse(UploadSchema, "File uploaded successfully"),
 });
 
-uploadRouter.post("/", adminAuthMiddleware, uploadMiddleware.single("file"), uploadController.create);
-
 // GET /uploads - Get all uploads
 uploadRegistry.registerPath({
 	method: "get",
-	path: "/api/uploads",
+	path: "/api/admin/uploads",
 	tags: ["Upload"],
 	responses: createApiResponse(z.array(UploadSchema), "Uploads retrieved successfully"),
 });
 
-uploadRouter.get("/", uploadController.getUploads);
-
 // GET /uploads/:id - Get upload by ID
 uploadRegistry.registerPath({
 	method: "get",
-	path: "/api/uploads/{id}",
+	path: "/api/admin/uploads/{id}",
 	tags: ["Upload"],
 	request: { params: z.object({ id: commonValidations.id }) },
 	responses: createApiResponse(UploadSchema, "Upload retrieved successfully"),
 });
 
+// DELETE /uploads/:id - Delete upload (Admin only)
+uploadRegistry.registerPath({
+	method: "delete",
+	path: "/api/admin/uploads/{id}",
+	tags: ["Upload"],
+	request: { params: z.object({ id: commonValidations.id }) },
+	responses: createApiResponse(z.null(), "Upload deleted successfully"),
+});
+
+uploadRouter.post("/", adminAuthMiddleware, uploadMiddleware.single("file"), uploadController.create);
+uploadRouter.get("/", uploadController.getUploads);
 uploadRouter.get(
 	"/:id",
 	validateRequest(z.object({ params: z.object({ id: commonValidations.id }) })),
 	uploadController.getUploadById,
 );
-
-// DELETE /uploads/:id - Delete upload (Admin only)
-uploadRegistry.registerPath({
-	method: "delete",
-	path: "/api/uploads/{id}",
-	tags: ["Upload"],
-	request: { params: z.object({ id: commonValidations.id }) },
-	responses: createApiResponse(z.null(), "Upload deleted successfully"),
-});
 
 uploadRouter.delete(
 	"/:id",

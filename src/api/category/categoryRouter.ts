@@ -17,32 +17,24 @@ categoryRegistry.register("Category", CategorySchema);
 // GET /categories - Get all categories
 categoryRegistry.registerPath({
 	method: "get",
-	path: "/api/categories",
+	path: "/api/admin/categories",
 	tags: ["Category"],
 	responses: createApiResponse(z.array(CategorySchema), "Categories retrieved successfully"),
 });
 
-categoryRouter.get("/", categoryController.getCategories);
-
 // GET /categories/:id - Get category by ID
 categoryRegistry.registerPath({
 	method: "get",
-	path: "/api/categories/{id}",
+	path: "/api/admin/categories/{id}",
 	tags: ["Category"],
 	request: { params: z.object({ id: commonValidations.id }) },
 	responses: createApiResponse(CategorySchema, "Category retrieved successfully"),
 });
 
-categoryRouter.get(
-	"/:id",
-	validateRequest(z.object({ params: z.object({ id: commonValidations.id }) })),
-	categoryController.getCategoryById,
-);
-
 // POST /categories - Create new category (Admin only)
 categoryRegistry.registerPath({
 	method: "post",
-	path: "/api/categories",
+	path: "/api/admin/categories",
 	tags: ["Category"],
 	request: {
 		body: {
@@ -57,17 +49,10 @@ categoryRegistry.registerPath({
 	responses: createApiResponse(CategorySchema, "Category created successfully"),
 });
 
-categoryRouter.post(
-	"/",
-	adminAuthMiddleware,
-	validateRequest(z.object({ body: CreateCategorySchema })),
-	categoryController.createCategory,
-);
-
 // PATCH /categories/:id - Update category (Admin only)
 categoryRegistry.registerPath({
 	method: "patch",
-	path: "/api/categories/{id}",
+	path: "/api/admin/categories/{id}",
 	tags: ["Category"],
 	request: {
 		params: z.object({ id: commonValidations.id }),
@@ -83,22 +68,34 @@ categoryRegistry.registerPath({
 	responses: createApiResponse(CategorySchema, "Category updated successfully"),
 });
 
+// DELETE /categories/:id - Delete category (Admin only)
+categoryRegistry.registerPath({
+	method: "delete",
+	path: "/api/admin/categories/{id}",
+	tags: ["Category"],
+	request: { params: z.object({ id: commonValidations.id }) },
+	responses: createApiResponse(z.null(), "Category deleted successfully"),
+});
+
+// Routes
+categoryRouter.get("/", categoryController.getCategories);
+categoryRouter.get(
+	"/:id",
+	validateRequest(z.object({ params: z.object({ id: commonValidations.id }) })),
+	categoryController.getCategoryById,
+);
+categoryRouter.post(
+	"/",
+	adminAuthMiddleware,
+	validateRequest(z.object({ body: CreateCategorySchema })),
+	categoryController.createCategory,
+);
 categoryRouter.patch(
 	"/:id",
 	adminAuthMiddleware,
 	validateRequest(z.object({ params: z.object({ id: commonValidations.id }), body: UpdateCategorySchema })),
 	categoryController.updateCategory,
 );
-
-// DELETE /categories/:id - Delete category (Admin only)
-categoryRegistry.registerPath({
-	method: "delete",
-	path: "/api/categories/{id}",
-	tags: ["Category"],
-	request: { params: z.object({ id: commonValidations.id }) },
-	responses: createApiResponse(z.null(), "Category deleted successfully"),
-});
-
 categoryRouter.delete(
 	"/:id",
 	adminAuthMiddleware,

@@ -12,36 +12,28 @@ export const dishRegistry = new OpenAPIRegistry();
 export const dishRouter: Router = express.Router();
 
 dishRegistry.register("Dish", DishSchema);
-
+// Swagger docs Generated
 // GET /dishes - Get all dishes
 dishRegistry.registerPath({
 	method: "get",
-	path: "/api/dishes",
+	path: "/api/admin/dishes",
 	tags: ["Dish"],
 	responses: createApiResponse(z.array(DishSchema), "Dishes retrieved successfully"),
 });
 
-dishRouter.get("/", dishController.getDishes);
-
 // GET /dishes/:id - Get dish by ID
 dishRegistry.registerPath({
 	method: "get",
-	path: "/api/dishes/{id}",
+	path: "/api/admin/dishes/{id}",
 	tags: ["Dish"],
 	request: { params: z.object({ id: commonValidations.id }) },
 	responses: createApiResponse(DishSchema, "Dish retrieved successfully"),
 });
 
-dishRouter.get(
-	"/:id",
-	validateRequest(z.object({ params: z.object({ id: commonValidations.id }) })),
-	dishController.getDishById,
-);
-
 // POST /dishes - Create new dish (Admin only)
 dishRegistry.registerPath({
 	method: "post",
-	path: "/api/dishes",
+	path: "/api/admin/dishes",
 	tags: ["Dish"],
 	request: {
 		body: {
@@ -56,17 +48,10 @@ dishRegistry.registerPath({
 	responses: createApiResponse(DishSchema, "Dish created successfully"),
 });
 
-dishRouter.post(
-	"/",
-	adminAuthMiddleware,
-	validateRequest(z.object({ body: CreateDishSchema })),
-	dishController.createDish,
-);
-
 // PATCH /dishes/:id - Update dish (Admin only)
 dishRegistry.registerPath({
 	method: "patch",
-	path: "/api/dishes/{id}",
+	path: "/api/admin/dishes/{id}",
 	tags: ["Dish"],
 	request: {
 		params: z.object({ id: commonValidations.id }),
@@ -82,21 +67,35 @@ dishRegistry.registerPath({
 	responses: createApiResponse(DishSchema, "Dish updated successfully"),
 });
 
+// DELETE /dishes/:id - Delete dish (Admin only)
+dishRegistry.registerPath({
+	method: "delete",
+	path: "/api/admin/dishes/{id}",
+	tags: ["Dish"],
+	request: { params: z.object({ id: commonValidations.id }) },
+	responses: createApiResponse(z.null(), "Dish deleted successfully"),
+});
+
+dishRouter.get("/", dishController.getDishes);
+
+dishRouter.get(
+	"/:id",
+	validateRequest(z.object({ params: z.object({ id: commonValidations.id }) })),
+	dishController.getDishById,
+);
+dishRouter.post(
+	"/",
+	adminAuthMiddleware,
+	validateRequest(z.object({ body: CreateDishSchema })),
+	dishController.createDish,
+);
+
 dishRouter.patch(
 	"/:id",
 	adminAuthMiddleware,
 	validateRequest(z.object({ params: z.object({ id: commonValidations.id }), body: UpdateDishSchema })),
 	dishController.updateDish,
 );
-
-// DELETE /dishes/:id - Delete dish (Admin only)
-dishRegistry.registerPath({
-	method: "delete",
-	path: "/api/dishes/{id}",
-	tags: ["Dish"],
-	request: { params: z.object({ id: commonValidations.id }) },
-	responses: createApiResponse(z.null(), "Dish deleted successfully"),
-});
 
 dishRouter.delete(
 	"/:id",
