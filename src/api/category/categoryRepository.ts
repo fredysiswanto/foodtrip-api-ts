@@ -18,8 +18,9 @@ export class CategoryRepository {
 		});
 	}
 
-	async create(data: Pick<Category, "name" | "description" | "slug">): Promise<Category> {
+	async create(data: Pick<Category, "name" | "description" | "slug">): Promise<Pick<Category, "id" | "name">> {
 		return prisma.category.create({
+			select: { id: true, name: true },
 			data,
 		});
 	}

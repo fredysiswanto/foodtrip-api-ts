@@ -29,12 +29,24 @@ export type UpdateRestaurantData = Partial<CreateRestaurantData> & {
 };
 
 export class RestaurantRepository {
-	async findAll(query: GetRestaurantsQuery): Promise<{ data: Restaurant[]; meta: PaginationMeta }> {
+	async findAll(query: GetRestaurantsQuery): Promise<{
+		data: Pick<Restaurant, "id" | "name" | "slug" | "address" | "status" | "isOpen" | "createdAt">[];
+		meta: PaginationMeta;
+	}> {
 		const { page, limit, skip } = getPagination(query);
 		const where = buildSearch(query.search, ["name"]);
 		const orderBy = buildOrderBy(query.sortBy, query.sortOrder, ["name", "createdAt"]);
 		const [restaurants, totalItems] = await Promise.all([
 			prisma.restaurant.findMany({
+				select: {
+					id: true,
+					name: true,
+					slug: true,
+					address: true,
+					status: true,
+					isOpen: true,
+					createdAt: true,
+				},
 				where,
 				skip,
 				take: limit,
@@ -50,8 +62,15 @@ export class RestaurantRepository {
 		return prisma.restaurant.findUnique({ where: { id } });
 	}
 
-	async create(data: CreateRestaurantInput): Promise<Restaurant> {
-		return prisma.restaurant.create({ data });
+	async create(data: CreateRestaurantInput): Promise<Pick<Restaurant, "id" | "name" | "createdAt">> {
+		return prisma.restaurant.create({
+			select: {
+				id: true,
+				name: true,
+				createdAt: true,
+			},
+			data,
+		});
 	}
 
 	async update(id: string, data: UpdateRestaurantData): Promise<Restaurant> {

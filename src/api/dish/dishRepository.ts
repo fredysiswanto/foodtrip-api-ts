@@ -10,12 +10,23 @@ import type { CreateDishInput, Dish, UpdateDishInput } from "./dishModel";
 import type { GetDishesQuery } from "./dishServices";
 
 export class DishRepository {
-	async findAll(query: GetDishesQuery): Promise<{ data: Dish[]; meta: PaginationMeta }> {
+	async findAll(query: GetDishesQuery): Promise<{
+		data: Pick<Dish, "id" | "name" | "description" | "price" | "isAvailable" | "createdAt">[];
+		meta: PaginationMeta;
+	}> {
 		const { page, limit, skip } = getPagination(query);
 		const where = buildSearch(query.search, ["name"]);
 		const orderBy = buildOrderBy(query.sortBy, query.sortOrder, ["name", "price", "createdAt"]);
 		const [dishes, totalItems] = await Promise.all([
 			prisma.dish.findMany({
+				select: {
+					id: true,
+					name: true,
+					description: true,
+					price: true,
+					isAvailable: true,
+					createdAt: true,
+				},
 				where,
 				skip,
 				take: limit,
@@ -33,8 +44,12 @@ export class DishRepository {
 		});
 	}
 
-	async create(data: CreateDishInput): Promise<Dish> {
+	async create(data: CreateDishInput): Promise<Pick<Dish, "id" | "name">> {
 		return prisma.dish.create({
+			select: {
+				id: true,
+				name: true,
+			},
 			data,
 		});
 	}
