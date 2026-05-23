@@ -33,7 +33,11 @@ export class DishService {
 		return !existingDish || existingDish.id === excludeDishId;
 	}
 
-	async findAll(query: GetDishesQuery): Promise<ServiceResponse<Dish[] | null>> {
+	async findAll(
+		query: GetDishesQuery,
+	): Promise<
+		ServiceResponse<Pick<Dish, "id" | "name" | "description" | "price" | "isAvailable" | "createdAt">[] | null>
+	> {
 		try {
 			const { data, meta } = await this.repository.findAll(query);
 
@@ -65,7 +69,7 @@ export class DishService {
 		}
 	}
 
-	async create(data: CreateDishInput): Promise<ServiceResponse<Dish | null>> {
+	async create(data: CreateDishInput): Promise<ServiceResponse<Pick<Dish, "id" | "name"> | null>> {
 		const relationError = await this.validateRelations(data);
 		if (relationError) {
 			return ServiceResponse.failure(relationError, null, StatusCodes.BAD_REQUEST);

@@ -38,7 +38,11 @@ export class RestaurantService {
 		return !existingRestaurant || existingRestaurant.id === restaurantId;
 	}
 
-	async findAll(query: GetRestaurantsQuery): Promise<ServiceResponse<Restaurant[] | null>> {
+	async findAll(
+		query: GetRestaurantsQuery,
+	): Promise<
+		ServiceResponse<Pick<Restaurant, "id" | "name" | "slug" | "address" | "status" | "isOpen" | "createdAt">[] | null>
+	> {
 		try {
 			const { data, meta } = await this.repository.findAll(query);
 
@@ -68,7 +72,7 @@ export class RestaurantService {
 		}
 	}
 
-	async create(data: CreateRestaurantInput): Promise<ServiceResponse<Restaurant | null>> {
+	async create(data: CreateRestaurantInput): Promise<ServiceResponse<Pick<Restaurant, "id" | "name"> | null>> {
 		// const relationError = await this.validateRelations(data);
 		// if (relationError) {
 		// 	return ServiceResponse.failure(relationError, null, StatusCodes.BAD_REQUEST);

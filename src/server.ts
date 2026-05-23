@@ -6,7 +6,6 @@ import { authRouter } from "@/api/auth/authRouter";
 import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter";
 import { adminRouter } from "@/api/routes/adminRouter";
 import { clientRouter } from "@/api/routes/clientRouter";
-import { userRouter } from "@/api/user/userRouter";
 import { openAPIRouter } from "@/api-docs/openAPIRouter";
 import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
