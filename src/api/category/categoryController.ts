@@ -33,12 +33,12 @@ export class CategoryController {
 		}
 	};
 
-	public createCategory: RequestHandler = async (req: Request, res: Response<ServiceResponseType<Category | null>>) => {
+	public createCategory: RequestHandler = async (
+		req: Request,
+		res: Response<ServiceResponseType<Pick<Category, "id" | "name"> | null>>,
+	) => {
 		try {
-			const validatedData = validateData(CreateCategorySchema, req.body) as Pick<
-				Category,
-				"name" | "description" | "slug"
-			>;
+			const validatedData = validateData(CreateCategorySchema, req.body);
 
 			const serviceResponse = await this.categoryService.create(validatedData);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
