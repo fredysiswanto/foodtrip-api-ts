@@ -1,6 +1,7 @@
 import type { Request, RequestHandler, Response } from "express";
 import { userService } from "@/api/user/userService";
 import { ServiceResponse } from "@/common/models/serviceResponse";
+import type { RegisterRequest } from "./authModel";
 import { authService } from "./authService";
 
 export class AuthController {
@@ -18,6 +19,21 @@ export class AuthController {
 		}
 
 		const serviceResponse = await userService.findById(authPayload.userId);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
+
+	public register: RequestHandler = async (req: Request, res: Response) => {
+		const payload = req.body as RegisterRequest;
+		req.log?.info({ email: payload.email, fullName: payload.fullName }, "User registration attempt");
+		const serviceResponse = await authService.register(payload);
+		if (serviceResponse.statusCode === 201) {
+			req.log?.info({ userId: serviceResponse.data?.id }, "User registered successfully");
+		} else {
+			req.log?.warn(
+				{ statusCode: serviceResponse.statusCode, message: serviceResponse.message },
+				"Registration failed",
+			);
+		}
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 }

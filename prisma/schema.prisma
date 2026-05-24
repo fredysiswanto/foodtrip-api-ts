@@ -77,7 +77,7 @@ model Role {
 
 model User {
   id           String         @id @default(uuid()) 
-  role         Role           @relation(fields: [roleId], references: [id])
+  role         Role           @relation(fields: [roleId], references: [id]) 
   roleId       String         
   fullName     String         @db.VarChar(150)
   email        String         @unique @db.VarChar(150)
