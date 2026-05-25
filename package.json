@@ -67,8 +67,7 @@
     ],
     "outDir": "dist",
     "format": [
-      "esm",
-      "cjs"
+      "esm"
     ],
     "target": "es2020",
     "sourcemap": true,
