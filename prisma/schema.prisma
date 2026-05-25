@@ -236,7 +236,7 @@ model Cart {
   restaurantId String     
   cartItems    CartItem[]
   createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
   @@unique([userId, restaurantId])
   @@index([userId])
@@ -252,8 +252,9 @@ model CartItem {
   price     Decimal  @db.Decimal(12, 2)
   notes     String?
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  @@unique([cartId, dishId, notes])
   @@index([cartId])
 }
 
@@ -282,7 +283,7 @@ model Order {
   orderItems     OrderItem[]
   delivery       Delivery?
   createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   deletedAt      DateTime?
 
   @@index([userId])

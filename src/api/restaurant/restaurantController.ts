@@ -11,8 +11,8 @@ class RestaurantController {
 	};
 
 	public getRestaurantById: RequestHandler = async (req: Request, res: Response) => {
-		const { restaurantId } = req.params;
-		const serviceResponse = await restaurantService.findById(restaurantId);
+		const { id } = req.params;
+		const serviceResponse = await restaurantService.findById(id);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
@@ -33,10 +33,10 @@ class RestaurantController {
 	};
 
 	public updateRestaurant: RequestHandler = async (req: Request, res: Response) => {
-		const { restaurantId } = req.params;
+		const { id } = req.params;
 		const updateData = req.body as Record<string, unknown>;
 
-		const serviceResponse = await restaurantService.update(restaurantId, updateData);
+		const serviceResponse = await restaurantService.update(id, updateData);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 }
