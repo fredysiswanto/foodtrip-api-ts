@@ -104,6 +104,7 @@ export class OrderService {
 				customerPhone: payload.customerPhone,
 				deliveryAddress: payload.deliveryAddress,
 				notes: payload.notes,
+				cartId: cart.id,
 				items: cart.cartItems.map((item) => ({
 					dishId: item.dishId,
 					dishName: item.dish.name,

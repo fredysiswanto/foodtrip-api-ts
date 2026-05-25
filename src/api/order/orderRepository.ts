@@ -43,6 +43,7 @@ export class OrderRepository {
 		customerPhone: string;
 		deliveryAddress: string;
 		notes?: string;
+		cartId?: string;
 		items: Array<{
 			dishId: string;
 			dishName: string;
@@ -81,6 +82,10 @@ export class OrderRepository {
 					notes: item.notes,
 				})),
 			});
+
+			if (params.cartId) {
+				await tx.cart.delete({ where: { id: params.cartId } });
+			}
 
 			return tx.order.findUnique({
 				where: { id: order.id },
