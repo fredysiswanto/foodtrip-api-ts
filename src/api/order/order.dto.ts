@@ -61,5 +61,10 @@ export const UpdateOrderStatusSchema = z.object({
 	status: OrderStatusSchema,
 });
 
+export const UpdateOrderPaymentStatusSchema = z.object({
+	paymentStatus: PaymentStatusSchema,
+});
+
 export type CreateOrderInput = z.infer<typeof CreateOrderSchema>;
 export type UpdateOrderStatusInput = z.infer<typeof UpdateOrderStatusSchema>;
+export type UpdateOrderPaymentStatusInput = z.infer<typeof UpdateOrderPaymentStatusSchema>;

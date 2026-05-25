@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
 import { cartRepository } from "@/api/cart/cartRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
-import type { CreateOrderInput, Order, UpdateOrderStatusInput } from "./order.dto";
+import type { CreateOrderInput, Order, UpdateOrderPaymentStatusInput, UpdateOrderStatusInput } from "./order.dto";
 import { OrderRepository } from "./orderRepository";
 
 export class OrderService {
@@ -137,6 +137,28 @@ export class OrderService {
 		} catch (error) {
 			return ServiceResponse.failure(
 				`Unable to update order status: ${error instanceof Error ? error.message : "Unknown error"}`,
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async updatePaymentStatus(
+		id: string,
+		payload: UpdateOrderPaymentStatusInput,
+	): Promise<ServiceResponse<Order | null>> {
+		try {
+			const order = await this.orderRepository.findById(id);
+			if (!order) {
+				return ServiceResponse.failure("Order not found.", null, StatusCodes.NOT_FOUND);
+			}
+
+			await this.orderRepository.updatePaymentStatus(id, payload.paymentStatus);
+			const updatedOrder = await this.orderRepository.findById(id);
+			return ServiceResponse.success("Order payment status updated successfully.", updatedOrder);
+		} catch (error) {
+			return ServiceResponse.failure(
+				`Unable to update order payment status: ${error instanceof Error ? error.message : "Unknown error"}`,
 				null,
 				StatusCodes.INTERNAL_SERVER_ERROR,
 			);

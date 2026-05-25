@@ -1,4 +1,4 @@
-import type { OrderStatus, PaymentMethod } from "@/generated/prisma/enums";
+import type { OrderStatus, PaymentMethod, PaymentStatus } from "@/generated/prisma/enums";
 import { prisma } from "@/utils/prismaClient";
 import type { Order } from "./order.dto";
 
@@ -93,6 +93,13 @@ export class OrderRepository {
 		return prisma.order.update({
 			where: { id },
 			data: { status },
+		});
+	}
+
+	async updatePaymentStatus(id: string, paymentStatus: PaymentStatus) {
+		return prisma.order.update({
+			where: { id },
+			data: { paymentStatus },
 		});
 	}
 

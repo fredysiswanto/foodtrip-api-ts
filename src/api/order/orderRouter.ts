@@ -5,7 +5,7 @@ import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
 import { commonValidations } from "@/common/utils/commonValidation";
 import { validateRequest } from "@/common/utils/httpHandlers";
-import { CreateOrderSchema, OrderSchema, UpdateOrderStatusSchema } from "./order.dto";
+import { CreateOrderSchema, OrderSchema, UpdateOrderPaymentStatusSchema, UpdateOrderStatusSchema } from "./order.dto";
 import { orderController } from "./orderController";
 
 export const orderRegistry = new OpenAPIRegistry();
@@ -63,6 +63,24 @@ orderRegistry.registerPath({
 	responses: createApiResponse(OrderSchema, "Order status updated successfully"),
 });
 
+orderRegistry.registerPath({
+	method: "patch",
+	path: "/api/admin/orders/{id}/payment-status",
+	tags: ["Order"],
+	request: {
+		params: z.object({ id: commonValidations.id }),
+		body: {
+			description: "Update order payment status payload",
+			content: {
+				"application/json": {
+					schema: UpdateOrderPaymentStatusSchema,
+				},
+			},
+		},
+	},
+	responses: createApiResponse(OrderSchema, "Order payment status updated successfully"),
+});
+
 orderRouter.use(adminAuthMiddleware);
 
 orderRouter.get("/", orderController.getOrdersAdmin);
@@ -76,4 +94,9 @@ orderRouter.patch(
 	"/:id/status",
 	validateRequest(z.object({ params: z.object({ id: commonValidations.id }), body: UpdateOrderStatusSchema })),
 	orderController.updateOrderStatus,
+);
+orderRouter.patch(
+	"/:id/payment-status",
+	validateRequest(z.object({ params: z.object({ id: commonValidations.id }), body: UpdateOrderPaymentStatusSchema })),
+	orderController.updateOrderPaymentStatus,
 );

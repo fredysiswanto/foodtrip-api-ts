@@ -2,7 +2,7 @@ import type { Request, RequestHandler, Response } from "express";
 import type { ServiceResponseType } from "@/common/models/serviceResponse";
 import { validateData } from "@/common/utils/commonValidation";
 import type { Order } from "./order.dto";
-import { CreateOrderSchema, UpdateOrderStatusSchema } from "./order.dto";
+import { CreateOrderSchema, UpdateOrderPaymentStatusSchema, UpdateOrderStatusSchema } from "./order.dto";
 import { OrderService } from "./orderService";
 
 export class OrderController {
@@ -64,6 +64,20 @@ export class OrderController {
 		try {
 			const validatedData = validateData(UpdateOrderStatusSchema, req.body);
 			const serviceResponse = await this.orderService.updateStatus(id, validatedData);
+			res.status(serviceResponse.statusCode).send(serviceResponse);
+		} catch (error) {
+			this.handleValidationErrorOrPanic(res, error);
+		}
+	};
+
+	public updateOrderPaymentStatus: RequestHandler = async (
+		req: Request,
+		res: Response<ServiceResponseType<Order | null>>,
+	) => {
+		const { id } = req.params;
+		try {
+			const validatedData = validateData(UpdateOrderPaymentStatusSchema, req.body);
+			const serviceResponse = await this.orderService.updatePaymentStatus(id, validatedData);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
 		} catch (error) {
 			this.handleValidationErrorOrPanic(res, error);
