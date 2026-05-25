@@ -14,22 +14,39 @@ export const CartSchema = z.object({
 	updatedAt: z.date(),
 });
 
+export const CartItemPayloadSchema = z.object({
+	dishId: z.string().uuid(),
+	quantity: z.number().int().positive(),
+	price: z.number().nonnegative().optional(),
+	notes: z.string().optional(),
+});
+
 export const CreateCartSchema = z.object({
 	userId: z.string().uuid(),
 	restaurantId: z.string().uuid(),
-	items: z.array(
-		z.object({
-			dishId: z.string().uuid(),
-			quantity: z.number().int().positive(),
-			price: z.number().nonnegative(),
-			note: z.string().optional(),
-		}),
-	),
+	items: z.array(CartItemPayloadSchema).min(1),
 });
 
+export const CreateCartItemSchema = z.object({
+	cartId: z.string().uuid(),
+	dishId: z.string().uuid(),
+	quantity: z.number().int().positive(),
+	price: z.number().nonnegative(),
+	notes: z.string().optional(),
+});
+
+export const UpdateCartItemSchema = z
+	.object({
+		quantity: z.number().int().positive().optional(),
+		notes: z.string().optional(),
+	})
+	.refine((data) => Object.keys(data).length > 0, {
+		message: "At least one field is required to update.",
+	});
+
 export type CreateCartInput = z.infer<typeof CreateCartSchema>;
-export type UpdateCartInput = z.infer<typeof UpdateCartSchema>;
-export const UpdateCartSchema = CreateCartSchema.partial();
+export type CreateCartItemInput = z.infer<typeof CreateCartItemSchema>;
+export type UpdateCartItemInput = z.infer<typeof UpdateCartItemSchema>;
 
 export type CartItem = Prisma.CartItemModel;
 export const CartItemSchema = z.object({

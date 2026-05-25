@@ -6,3 +6,5 @@ export const cartRouter: Router = express.Router();
 // Routes admin only can view
 cartRouter.get("/", cartController.getCarts);
 cartRouter.post("/", cartController.createCart);
+cartRouter.patch("/items/:itemId", cartController.updateCartItem);
+cartRouter.delete("/items/:itemId", cartController.deleteCartItem);

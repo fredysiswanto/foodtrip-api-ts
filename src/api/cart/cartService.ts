@@ -1,10 +1,11 @@
 import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
 import { ServiceResponse } from "@/common/models/serviceResponse";
-import type { Cart } from "./cart.dto";
+import type { Cart, CreateCartInput, CreateCartItemInput, UpdateCartItemInput } from "./cart.dto";
 import { cartRepository } from "./cartRepository";
 
 export class CartService {
 	private cartRepository = cartRepository;
+
 	async findAll(userId: string | undefined): Promise<ServiceResponse<Cart[] | null>> {
 		try {
 			const data = await this.cartRepository.findAll(userId);
@@ -18,112 +19,119 @@ export class CartService {
 		}
 	}
 
-	async create(
-		userId: string | undefined,
-		payload: { restaurantId: string; items: any[] },
-	): Promise<ServiceResponse<Cart | null>> {
+	async create(userId: string | undefined, payload: CreateCartInput): Promise<ServiceResponse<Cart | null>> {
 		if (!userId) {
 			return ServiceResponse.failure("User ID is required to create a cart.", null, StatusCodes.BAD_REQUEST);
 		}
 
-		const existingCart = await this.cartRepository.findCart(userId, payload.restaurantId);
-		if (existingCart) {
-			await this.addItemToCart(existingCart.id, payload.items);
-			return ServiceResponse.success("Cart updated successfully.", existingCart);
-		}
-
 		try {
-			const data = await this.cartRepository.createCart(userId, payload.restaurantId);
-			await this.addItemToCart(data.id, payload.items);
-			return ServiceResponse.success("Cart created successfully.", data, StatusCodes.CREATED);
+			let cart = await this.cartRepository.findCart(userId, payload.restaurantId);
+			const isNewCart = !cart;
+
+			if (!cart) {
+				cart = await this.cartRepository.createCart(userId, payload.restaurantId);
+			}
+
+			await this.addItemsToCart(cart.id, payload.restaurantId, payload.items);
+
+			const updatedCart = await this.cartRepository.findCart(userId, payload.restaurantId);
+			return ServiceResponse.success(
+				isNewCart ? "Cart created successfully." : "Cart updated successfully.",
+				updatedCart,
+				isNewCart ? StatusCodes.CREATED : StatusCodes.OK,
+			);
 		} catch (error) {
 			return ServiceResponse.failure(
-				`Unable to create cart: ${error instanceof Error ? error.message : "Unknown error"}`,
+				`Unable to create or update cart: ${error instanceof Error ? error.message : "Unknown error"}`,
 				null,
 				StatusCodes.INTERNAL_SERVER_ERROR,
 			);
 		}
 	}
 
-	// payload body create cart
-	// {
-	// "restaurantId": "{{resto_id}}",
-	// "dishId": "{{dish_id}}",
-	// "items": [
-	//     {
-	//         "quantity": 1,
-	//         "price": 2000,
-	//         "note":"woke"
-	//     }
-	// ]
-	// }
+	async updateCartItem(userId: string | undefined, itemId: string, payload: UpdateCartItemInput) {
+		if (!userId) {
+			return ServiceResponse.failure("User ID is required to update a cart item.", null, StatusCodes.BAD_REQUEST);
+		}
 
-	// add cart item, update cart item, remove cart item, clear cart, etc. can be implemented here
-	private async addItemToCart(cardId: string, items: any[]) {
-		// { cartId: string; dishId: string; quantity: number; price: number; notes?: string }
+		try {
+			const cartItem = await this.cartRepository.findCartItemById(itemId);
+			if (!cartItem) {
+				return ServiceResponse.failure("Cart item not found.", null, StatusCodes.NOT_FOUND);
+			}
 
-		const itemCartData: { cartId: string; dishId: string; quantity: number; price: number; notes?: string }[] = [];
+			if (cartItem.cart.userId !== userId) {
+				return ServiceResponse.failure(
+					"Forbidden. You may only update your own cart items.",
+					null,
+					StatusCodes.FORBIDDEN,
+				);
+			}
 
-		items.forEach((item) => {
-			itemCartData.push({
-				cartId: cardId, // You should replace this with the actual cart ID after fetching/creating the cart
-				dishId: item.dishId,
-				quantity: item.quantity,
-				price: item.price,
-				notes: item.notes,
-			});
-		});
+			if (payload.quantity !== undefined) {
+				await this.cartRepository.updateCartItem(itemId, payload.quantity);
+			}
 
-		console.log(itemCartData);
-		await cartRepository.createCartItem(itemCartData);
+			const cart = await this.cartRepository.findCart(userId, cartItem.cart.restaurantId);
+			return ServiceResponse.success("Cart item updated successfully.", cart);
+		} catch (error) {
+			return ServiceResponse.failure(
+				`Unable to update cart item: ${error instanceof Error ? error.message : "Unknown error"}`,
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+			);
+		}
 	}
 
-	// async addToCart(params: { userId: string; restaurantId: string; dishId: string; quantity: number; notes?: string }) {
-	// 	const { userId, restaurantId, dishId, quantity, notes } = params;
+	async deleteCartItem(userId: string | undefined, itemId: string) {
+		if (!userId) {
+			return ServiceResponse.failure("User ID is required to delete a cart item.", null, StatusCodes.BAD_REQUEST);
+		}
 
-	// 	return prisma.$transaction(async (tx) => {
-	// 		/**
-	// 		 * Validate Dish
-	// 		 */
-	// 		const dish = await tx.dish.findFirst({
-	// 			where: {
-	// 				id: dishId,
-	// 				restaurantId,
-	// 				isAvailable: true,
-	// 			},
-	// 		});
+		try {
+			const cartItem = await this.cartRepository.findCartItemById(itemId);
+			if (!cartItem) {
+				return ServiceResponse.failure("Cart item not found.", null, StatusCodes.NOT_FOUND);
+			}
 
-	// 		if (!dish) {
-	// 			throw new Error("Dish not found");
-	// 		}
+			if (cartItem.cart.userId !== userId) {
+				return ServiceResponse.failure(
+					"Forbidden. You may only delete your own cart items.",
+					null,
+					StatusCodes.FORBIDDEN,
+				);
+			}
 
-	// 		/**
-	// 		 * Find/Create Cart
-	// 		 */
-	// 		let cart = await this.cartRepository.findCart(userId, restaurantId);
+			await this.cartRepository.deleteCartItem(itemId);
+			const cart = await this.cartRepository.findCart(userId, cartItem.cart.restaurantId);
+			return ServiceResponse.success("Cart item deleted successfully.", cart);
+		} catch (error) {
+			return ServiceResponse.failure(
+				`Unable to delete cart item: ${error instanceof Error ? error.message : "Unknown error"}`,
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
 
-	// 		if (!cart) {
-	// 			cart = await this.cartRepository.createCart(userId, restaurantId);
-	// 		}
+	private async addItemsToCart(cartId: string, restaurantId: string, items: CreateCartInput["items"]) {
+		const itemCartData: CreateCartItemInput[] = [];
 
-	// 		/**
-	// 		 * Existing Item
-	// 		 */
-	// 		const existingItem = await this.cartRepository.findCartItem(cart.id, dishId, notes);
+		for (const item of items) {
+			const dish = await this.cartRepository.findDishById(item.dishId);
+			if (!dish || dish.restaurantId !== restaurantId || !dish.isAvailable) {
+				throw new Error(`Dish with ID ${item.dishId} is not available for this restaurant.`);
+			}
 
-	// 		if (existingItem) {
-	// 			await this.cartRepository.updateCartItem(existingItem.id, existingItem.quantity + quantity);
-	// 		} else {
-	// 			await this.cartRepository.createCartItem({
-	// 				cartId: cart.id,
-	// 				dishId,
-	// 				quantity,
-	// 				price: Number(dish.price),
-	// 				notes,
-	// 			});
-	// 		}
+			itemCartData.push({
+				cartId,
+				dishId: item.dishId,
+				quantity: item.quantity,
+				price: Number(dish.price),
+				notes: item.notes,
+			});
+		}
 
-	// 		return this.cartRepository.findCart(userId, restaurantId);
-	// 	});
-	// }
+		await this.cartRepository.createOrUpdateCartItems(itemCartData);
+	}
 }

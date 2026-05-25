@@ -13,11 +13,14 @@ class CartRepository {
 					select: { name: true },
 				},
 				cartItems: {
-					select: { id: true, quantity: true, price: true },
+					include: {
+						dish: true,
+					},
 				},
 			},
 		});
 	}
+
 	async findCart(userId: string, restaurantId: string) {
 		return prisma.cart.findUnique({
 			where: {
@@ -42,28 +45,81 @@ class CartRepository {
 				userId,
 				restaurantId,
 			},
+			include: {
+				cartItems: {
+					include: {
+						dish: true,
+					},
+				},
+			},
+		});
+	}
+
+	async findDishById(dishId: string) {
+		return prisma.dish.findUnique({
+			where: { id: dishId },
 			select: {
 				id: true,
-				userId: true,
 				restaurantId: true,
-				createdAt: true,
+				price: true,
+				isAvailable: true,
 			},
 		});
 	}
 
-	async findCartItem(cartId: string, dishId: string, notes?: string) {
-		return prisma.cartItem.findFirst({
-			where: {
-				cartId,
-				dishId,
-				notes: notes || null,
-			},
+	async createOrUpdateCartItems(
+		cartItemData: { cartId: string; dishId: string; quantity: number; price: number; notes?: string | null }[],
+	) {
+		return prisma.$transaction(async (tx) => {
+			const results = [] as Array<
+				Awaited<ReturnType<typeof tx.cartItem.create>> | Awaited<ReturnType<typeof tx.cartItem.update>>
+			>;
+			for (const item of cartItemData) {
+				const existingItem = await tx.cartItem.findFirst({
+					where: {
+						cartId: item.cartId,
+						dishId: item.dishId,
+						notes: item.notes ?? null,
+					},
+				});
+
+				if (existingItem) {
+					results.push(
+						await tx.cartItem.update({
+							where: { id: existingItem.id },
+							data: { quantity: { increment: item.quantity } },
+						}),
+					);
+				} else {
+					results.push(
+						await tx.cartItem.create({
+							data: {
+								cartId: item.cartId,
+								dishId: item.dishId,
+								quantity: item.quantity,
+								price: item.price,
+								notes: item.notes,
+							},
+						}),
+					);
+				}
+			}
+
+			return results;
 		});
 	}
 
-	async createCartItem(data: { cartId: string; dishId: string; quantity: number; price: number; notes?: string }[]) {
-		return prisma.cartItem.createMany({
-			data,
+	async findCartItemById(id: string) {
+		return prisma.cartItem.findUnique({
+			where: { id },
+			include: {
+				cart: {
+					select: {
+						userId: true,
+						restaurantId: true,
+					},
+				},
+			},
 		});
 	}
 

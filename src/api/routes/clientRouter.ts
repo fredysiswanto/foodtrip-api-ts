@@ -13,3 +13,5 @@ clientRouter.get("/dishes/:id", dishController.getDishById);
 clientRouter.get("/dishes", dishController.getDishes);
 clientRouter.get("/my-carts", cartController.getCarts);
 clientRouter.post("/add-cart", cartController.createCart);
+clientRouter.patch("/cart-items/:itemId", cartController.updateCartItem);
+clientRouter.delete("/cart-items/:itemId", cartController.deleteCartItem);

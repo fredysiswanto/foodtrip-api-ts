@@ -1,7 +1,8 @@
 import type { Request, RequestHandler, Response } from "express";
 import type { ServiceResponseType } from "@/common/models/serviceResponse";
 import { validateData } from "@/common/utils/commonValidation";
-import { type Cart, CreateCartSchema } from "./cart.dto";
+import type { Cart } from "./cart.dto";
+import { CreateCartSchema, UpdateCartItemSchema } from "./cart.dto";
 import { CartService } from "./cartService";
 
 class CartController {
@@ -18,8 +19,7 @@ class CartController {
 
 	public createCart: RequestHandler = async (req: Request, res: Response) => {
 		const userId = (req as Request & { user?: { userId: string } }).user?.userId;
-		const payload = req.body as { restaurantId: string; items: any[] };
-		// console.log("Received create cart request with payload:", payload, "for userId:", userId);
+		const payload = req.body;
 
 		try {
 			const validatedData = validateData(CreateCartSchema, {
@@ -35,8 +35,43 @@ class CartController {
 		}
 	};
 
+	public updateCartItem: RequestHandler = async (req: Request, res: Response) => {
+		const userId = (req as Request & { user?: { userId: string } }).user?.userId;
+		const itemId = req.params.itemId;
+		const payload = req.body;
+
+		try {
+			const validatedData = validateData(UpdateCartItemSchema, payload);
+			const serviceResponse = await this.cartService.updateCartItem(userId, itemId, validatedData);
+			res.status(serviceResponse.statusCode).send(serviceResponse);
+		} catch (error) {
+			this.handleValidationErrorOrPanic(res, error);
+		}
+	};
+
+	public deleteCartItem: RequestHandler = async (req: Request, res: Response) => {
+		const userId = (req as Request & { user?: { userId: string } }).user?.userId;
+		const itemId = req.params.itemId;
+
+		try {
+			const serviceResponse = await this.cartService.deleteCartItem(userId, itemId);
+			res.status(serviceResponse.statusCode).send(serviceResponse);
+		} catch (error) {
+			this.handleUnexpectedError(res, error);
+		}
+	};
+
 	private handleValidationErrorOrPanic(res: Response, error: unknown) {
 		if (error instanceof Error) {
+			if (error.name === "ZodError") {
+				return res.status(400).json({
+					success: false,
+					message: error.message,
+					data: null,
+					statusCode: 400,
+				});
+			}
+
 			try {
 				const parsedErrors = JSON.parse(error.message);
 				return res.status(400).json({
