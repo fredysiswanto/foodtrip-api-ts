@@ -1,4 +1,4 @@
-import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
+import { StatusCodes } from "http-status-codes";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import type { Cart, CreateCartInput, CreateCartItemInput, UpdateCartItemInput } from "./cart.dto";
 import { cartRepository } from "./cartRepository";

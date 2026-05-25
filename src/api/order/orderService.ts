@@ -1,4 +1,4 @@
-import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
+import { StatusCodes } from "http-status-codes";
 import { cartRepository } from "@/api/cart/cartRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import type { CreateOrderInput, Order, UpdateOrderPaymentStatusInput, UpdateOrderStatusInput } from "./order.dto";
