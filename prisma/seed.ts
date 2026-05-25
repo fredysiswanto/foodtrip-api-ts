@@ -148,54 +148,54 @@ async function main() {
 	});
 
 	const jimboRestaurant = await prisma.restaurant.upsert({
-		where: { slug: "tasty-thai" },
+		where: { slug: "nasi-uduk-betawi" },
 		update: {
-			name: "Tasty Thai",
-			address: "Jl. Makanan 123",
+			name: "Warung Nasi Uduk Betawi",
+			address: "Jl. Kebon Kacang No. 12",
 			city: "Jakarta",
 			province: "DKI Jakarta",
 			postalCode: "10220",
-			email: "contact@tastythai.id",
-			phone: "+621234567890",
+			email: "info@nasiudukbetawi.id",
+			phone: "+62212345678",
 			status: "ACTIVE",
 			isOpen: true,
 		},
 		create: {
-			name: "Tasty Thai",
-			slug: "tasty-thai",
-			address: "Jl. Makanan 123",
+			name: "Warung Nasi Uduk Betawi",
+			slug: "nasi-uduk-betawi",
+			address: "Jl. Kebon Kacang No. 12",
 			city: "Jakarta",
 			province: "DKI Jakarta",
 			postalCode: "10220",
-			email: "contact@tastythai.id",
-			phone: "+621234567890",
+			email: "info@nasiudukbetawi.id",
+			phone: "+62212345678",
 			status: "ACTIVE",
 			isOpen: true,
 		},
 	});
 
 	const burgerRestaurant = await prisma.restaurant.upsert({
-		where: { slug: "urban-burger" },
+		where: { slug: "sate-madura-pak-jono" },
 		update: {
-			name: "Urban Burger",
-			address: "Jl. Santapan 45",
-			city: "Bandung",
-			province: "West Java",
-			postalCode: "40123",
-			email: "hello@urbanburger.id",
-			phone: "+622345678901",
+			name: "Sate Madura Pak Jono",
+			address: "Jl. Raya Rungkut No. 45",
+			city: "Surabaya",
+			province: "East Java",
+			postalCode: "60293",
+			email: "halo@satemadura.id",
+			phone: "+623123456789",
 			status: "ACTIVE",
 			isOpen: true,
 		},
 		create: {
-			name: "Urban Burger",
-			slug: "urban-burger",
-			address: "Jl. Santapan 45",
-			city: "Bandung",
-			province: "West Java",
-			postalCode: "40123",
-			email: "hello@urbanburger.id",
-			phone: "+622345678901",
+			name: "Sate Madura Pak Jono",
+			slug: "sate-madura-pak-jono",
+			address: "Jl. Raya Rungkut No. 45",
+			city: "Surabaya",
+			province: "East Java",
+			postalCode: "60293",
+			email: "halo@satemadura.id",
+			phone: "+623123456789",
 			status: "ACTIVE",
 			isOpen: true,
 		},
@@ -222,120 +222,120 @@ async function main() {
 		skipDuplicates: true,
 	});
 
-	const thaiCategory = await prisma.category.upsert({
-		where: { slug: "thai" },
-		update: { name: "Thai" },
-		create: { name: "Thai", slug: "thai", description: "Authentic Thai dishes" },
+	const nasiCategory = await prisma.category.upsert({
+		where: { slug: "nasi" },
+		update: { name: "Nasi" },
+		create: { name: "Nasi", slug: "nasi", description: "Menu nasi khas Indonesia" },
 	});
 
-	const burgerCategory = await prisma.category.upsert({
-		where: { slug: "burger" },
-		update: { name: "Burgers" },
-		create: { name: "Burgers", slug: "burger", description: "Juicy burgers and sides" },
+	const sateCategory = await prisma.category.upsert({
+		where: { slug: "sate" },
+		update: { name: "Sate" },
+		create: { name: "Sate", slug: "sate", description: "Pilihan sate dan lauk pendamping" },
 	});
 
 	const drinksCategory = await prisma.category.upsert({
-		where: { slug: "drinks" },
-		update: { name: "Drinks" },
-		create: { name: "Drinks", slug: "drinks", description: "Refreshing beverages" },
+		where: { slug: "minuman" },
+		update: { name: "Minuman" },
+		create: { name: "Minuman", slug: "minuman", description: "Minuman segar dan tradisional" },
 	});
 
-	const padThai = await prisma.dish.upsert({
-		where: { restaurantId_slug: { restaurantId: jimboRestaurant.id, slug: "pad-thai" } },
+	const nasiUduk = await prisma.dish.upsert({
+		where: { restaurantId_slug: { restaurantId: jimboRestaurant.id, slug: "nasi-uduk-komplit" } },
 		update: {
-			description: "Classic stir-fried rice noodles with tamarind sauce.",
-			price: 55000,
-			stock: 25,
-			isAvailable: true,
-		},
-		create: {
-			restaurantId: jimboRestaurant.id,
-			categoryId: thaiCategory.id,
-			name: "Pad Thai",
-			slug: "pad-thai",
-			description: "Classic stir-fried rice noodles with tamarind sauce.",
-			price: 55000,
-			stock: 25,
-			isAvailable: true,
-		},
-	});
-
-	const greenCurry = await prisma.dish.upsert({
-		where: { restaurantId_slug: { restaurantId: jimboRestaurant.id, slug: "green-curry" } },
-		update: {
-			description: "Green curry with coconut milk and fresh basil.",
-			price: 65000,
-			stock: 18,
-			isAvailable: true,
-		},
-		create: {
-			restaurantId: jimboRestaurant.id,
-			categoryId: thaiCategory.id,
-			name: "Green Curry",
-			slug: "green-curry",
-			description: "Green curry with coconut milk and fresh basil.",
-			price: 65000,
-			stock: 18,
-			isAvailable: true,
-		},
-	});
-
-	const classicBurger = await prisma.dish.upsert({
-		where: { restaurantId_slug: { restaurantId: burgerRestaurant.id, slug: "classic-burger" } },
-		update: {
-			description: "Signature beef burger with lettuce and tomato.",
-			price: 70000,
+			description: "Nasi uduk komplit dengan ayam goreng, telur, dan sambal kacang.",
+			price: 42000,
 			stock: 30,
 			isAvailable: true,
 		},
 		create: {
-			restaurantId: burgerRestaurant.id,
-			categoryId: burgerCategory.id,
-			name: "Classic Burger",
-			slug: "classic-burger",
-			description: "Signature beef burger with lettuce and tomato.",
-			price: 70000,
+			restaurantId: jimboRestaurant.id,
+			categoryId: nasiCategory.id,
+			name: "Nasi Uduk Komplit",
+			slug: "nasi-uduk-komplit",
+			description: "Nasi uduk komplit dengan ayam goreng, telur, dan sambal kacang.",
+			price: 42000,
 			stock: 30,
 			isAvailable: true,
 		},
 	});
 
-	const fries = await prisma.dish.upsert({
-		where: { restaurantId_slug: { restaurantId: burgerRestaurant.id, slug: "crispy-fries" } },
+	const ayamGorengKremes = await prisma.dish.upsert({
+		where: { restaurantId_slug: { restaurantId: jimboRestaurant.id, slug: "ayam-goreng-kremes" } },
 		update: {
-			description: "Golden fries with house seasoning.",
-			price: 25000,
+			description: "Ayam goreng kremes khas Betawi, renyah dan gurih.",
+			price: 38000,
+			stock: 20,
+			isAvailable: true,
+		},
+		create: {
+			restaurantId: jimboRestaurant.id,
+			categoryId: nasiCategory.id,
+			name: "Ayam Goreng Kremes",
+			slug: "ayam-goreng-kremes",
+			description: "Ayam goreng kremes khas Betawi, renyah dan gurih.",
+			price: 38000,
+			stock: 20,
+			isAvailable: true,
+		},
+	});
+
+	const sateAyam = await prisma.dish.upsert({
+		where: { restaurantId_slug: { restaurantId: burgerRestaurant.id, slug: "sate-ayam-madura" } },
+		update: {
+			description: "Sate ayam Madura dengan bumbu kecap dan sambal kacang.",
+			price: 45000,
 			stock: 40,
 			isAvailable: true,
 		},
 		create: {
 			restaurantId: burgerRestaurant.id,
-			categoryId: burgerCategory.id,
-			name: "Crispy Fries",
-			slug: "crispy-fries",
-			description: "Golden fries with house seasoning.",
-			price: 25000,
+			categoryId: sateCategory.id,
+			name: "Sate Ayam Madura",
+			slug: "sate-ayam-madura",
+			description: "Sate ayam Madura dengan bumbu kecap dan sambal kacang.",
+			price: 45000,
 			stock: 40,
 			isAvailable: true,
 		},
 	});
 
-	const icedTea = await prisma.dish.upsert({
-		where: { restaurantId_slug: { restaurantId: burgerRestaurant.id, slug: "iced-tea" } },
+	const lontongSayur = await prisma.dish.upsert({
+		where: { restaurantId_slug: { restaurantId: burgerRestaurant.id, slug: "lontong-sayur" } },
 		update: {
-			description: "Chilled lemon iced tea.",
-			price: 20000,
-			stock: 50,
+			description: "Lontong sayur hangat dengan kuah santan dan telur pindang.",
+			price: 35000,
+			stock: 25,
+			isAvailable: true,
+		},
+		create: {
+			restaurantId: burgerRestaurant.id,
+			categoryId: sateCategory.id,
+			name: "Lontong Sayur",
+			slug: "lontong-sayur",
+			description: "Lontong sayur hangat dengan kuah santan dan telur pindang.",
+			price: 35000,
+			stock: 25,
+			isAvailable: true,
+		},
+	});
+
+	const esTehManis = await prisma.dish.upsert({
+		where: { restaurantId_slug: { restaurantId: burgerRestaurant.id, slug: "es-teh-manis" } },
+		update: {
+			description: "Es teh manis segar dengan aroma jeruk nipis.",
+			price: 12000,
+			stock: 60,
 			isAvailable: true,
 		},
 		create: {
 			restaurantId: burgerRestaurant.id,
 			categoryId: drinksCategory.id,
-			name: "Iced Tea",
-			slug: "iced-tea",
-			description: "Chilled lemon iced tea.",
-			price: 20000,
-			stock: 50,
+			name: "Es Teh Manis",
+			slug: "es-teh-manis",
+			description: "Es teh manis segar dengan aroma jeruk nipis.",
+			price: 12000,
+			stock: 60,
 			isAvailable: true,
 		},
 	});
@@ -346,7 +346,7 @@ async function main() {
 			status: "DELIVERING",
 			paymentStatus: "PAID",
 			paymentMethod: "CASH",
-			total: 142000,
+			total: 102000,
 			confirmedAt: new Date(),
 			updatedAt: new Date(),
 		},
@@ -354,32 +354,32 @@ async function main() {
 			orderNo: "ORD-0001",
 			userId: customerUser.id,
 			restaurantId: burgerRestaurant.id,
-			subtotal: 120000,
-			deliveryFee: 15000,
-			tax: 7000,
-			total: 142000,
+			subtotal: 93000,
+			deliveryFee: 9000,
+			tax: 0,
+			total: 102000,
 			status: "DELIVERING",
 			paymentStatus: "PAID",
 			paymentMethod: "CASH",
 			customerName: "Customer User",
 			customerPhone: "+621111111111",
-			deliveryAddress: "Jl. Contoh No. 10, Bandung",
-			notes: "Please deliver to the side entrance.",
+			deliveryAddress: "Jl. Melati No. 18, Surabaya",
+			notes: "Antar ke rumah samping toko.",
 			orderItems: {
 				create: [
 					{
-						dishId: classicBurger.id,
-						dishName: classicBurger.name,
-						dishPrice: classicBurger.price,
+						dishId: sateAyam.id,
+						dishName: sateAyam.name,
+						dishPrice: sateAyam.price,
 						quantity: 1,
-						subtotal: classicBurger.price,
+						subtotal: sateAyam.price,
 					},
 					{
-						dishId: fries.id,
-						dishName: fries.name,
-						dishPrice: fries.price,
+						dishId: esTehManis.id,
+						dishName: esTehManis.name,
+						dishPrice: esTehManis.price,
 						quantity: 1,
-						subtotal: fries.price,
+						subtotal: esTehManis.price,
 					},
 				],
 			},
@@ -399,7 +399,7 @@ async function main() {
 			status: "CONFIRMED",
 			paymentStatus: "PAID",
 			paymentMethod: "EWALLET",
-			total: 140000,
+			total: 95000,
 			confirmedAt: new Date(),
 			updatedAt: new Date(),
 		},
@@ -407,32 +407,32 @@ async function main() {
 			orderNo: "ORD-0002",
 			userId: customerUser.id,
 			restaurantId: jimboRestaurant.id,
-			subtotal: 120000,
-			deliveryFee: 15000,
-			tax: 5000,
-			total: 140000,
+			subtotal: 95000,
+			deliveryFee: 12000,
+			tax: 0,
+			total: 107000,
 			status: "CONFIRMED",
 			paymentStatus: "PAID",
 			paymentMethod: "EWALLET",
 			customerName: "Customer User",
 			customerPhone: "+621111111111",
-			deliveryAddress: "Jl. Contoh No. 10, Bandung",
-			notes: "Keep the drink separate.",
+			deliveryAddress: "Jl. Kebun Jeruk No. 4, Jakarta",
+			notes: "Jangan lupa bawa sambal terpisah.",
 			orderItems: {
 				create: [
 					{
-						dishId: padThai.id,
-						dishName: padThai.name,
-						dishPrice: padThai.price,
+						dishId: nasiUduk.id,
+						dishName: nasiUduk.name,
+						dishPrice: nasiUduk.price,
 						quantity: 1,
-						subtotal: padThai.price,
+						subtotal: nasiUduk.price,
 					},
 					{
-						dishId: icedTea.id,
-						dishName: icedTea.name,
-						dishPrice: icedTea.price,
+						dishId: ayamGorengKremes.id,
+						dishName: ayamGorengKremes.name,
+						dishPrice: ayamGorengKremes.price,
 						quantity: 1,
-						subtotal: icedTea.price,
+						subtotal: ayamGorengKremes.price,
 					},
 				],
 			},
@@ -454,97 +454,97 @@ async function main() {
 		data: [
 			{
 				cartId: cart.id,
-				dishId: fries.id,
+				dishId: sateAyam.id,
 				quantity: 2,
-				price: fries.price,
-				notes: "Extra crispy",
+				price: sateAyam.price,
+				notes: "Bumbu kacang extra",
 			},
 			{
 				cartId: cart.id,
-				dishId: icedTea.id,
+				dishId: esTehManis.id,
 				quantity: 1,
-				price: icedTea.price,
-				notes: "No ice",
+				price: esTehManis.price,
+				notes: "Kurang manis",
 			},
 		],
 		skipDuplicates: true,
 	});
 
 	const logoUpload = await prisma.upload.upsert({
-		where: { filename: "tasty-thai-logo.png" },
+		where: { filename: "nasi-uduk-betawi-logo.png" },
 		update: {
-			path: "/uploads/tasty-thai-logo.png",
+			path: "/uploads/nasi-uduk-betawi-logo.png",
 			folder: "restaurant",
 			mimeType: "image/png",
 			size: 18000n,
 		},
 		create: {
-			originalName: "tasty-thai-logo.png",
-			filename: "tasty-thai-logo.png",
+			originalName: "nasi-uduk-betawi-logo.png",
+			filename: "nasi-uduk-betawi-logo.png",
 			mimeType: "image/png",
 			type: "restaurant_logo",
 			folder: "restaurant",
-			path: "/uploads/tasty-thai-logo.png",
+			path: "/uploads/nasi-uduk-betawi-logo.png",
 			size: 18000n,
 			uploadedById: adminUser.id,
 		},
 	});
 
 	const bannerUpload = await prisma.upload.upsert({
-		where: { filename: "urban-burger-banner.png" },
+		where: { filename: "sate-madura-banner.png" },
 		update: {
-			path: "/uploads/urban-burger-banner.png",
+			path: "/uploads/sate-madura-banner.png",
 			folder: "restaurant",
 			mimeType: "image/png",
 			size: 25000n,
 		},
 		create: {
-			originalName: "urban-burger-banner.png",
-			filename: "urban-burger-banner.png",
+			originalName: "sate-madura-banner.png",
+			filename: "sate-madura-banner.png",
 			mimeType: "image/png",
 			type: "restaurant_banner",
 			folder: "restaurant",
-			path: "/uploads/urban-burger-banner.png",
+			path: "/uploads/sate-madura-banner.png",
 			size: 25000n,
 			uploadedById: adminUser.id,
 		},
 	});
 
 	const dishUploadA = await prisma.upload.upsert({
-		where: { filename: "pad-thai.png" },
+		where: { filename: "nasi-uduk.png" },
 		update: {
-			path: "/uploads/pad-thai.png",
+			path: "/uploads/nasi-uduk.png",
 			folder: "dish",
 			mimeType: "image/png",
 			size: 22000n,
 		},
 		create: {
-			originalName: "pad-thai.png",
-			filename: "pad-thai.png",
+			originalName: "nasi-uduk.png",
+			filename: "nasi-uduk.png",
 			mimeType: "image/png",
 			type: "dish_image",
 			folder: "dish",
-			path: "/uploads/pad-thai.png",
+			path: "/uploads/nasi-uduk.png",
 			size: 22000n,
 			uploadedById: ownerUser.id,
 		},
 	});
 
 	const dishUploadB = await prisma.upload.upsert({
-		where: { filename: "classic-burger.png" },
+		where: { filename: "sate-ayam.png" },
 		update: {
-			path: "/uploads/classic-burger.png",
+			path: "/uploads/sate-ayam.png",
 			folder: "dish",
 			mimeType: "image/png",
 			size: 23000n,
 		},
 		create: {
-			originalName: "classic-burger.png",
-			filename: "classic-burger.png",
+			originalName: "sate-ayam.png",
+			filename: "sate-ayam.png",
 			mimeType: "image/png",
 			type: "dish_image",
 			folder: "dish",
-			path: "/uploads/classic-burger.png",
+			path: "/uploads/sate-ayam.png",
 			size: 23000n,
 			uploadedById: ownerUser.id,
 		},
@@ -569,12 +569,12 @@ async function main() {
 	});
 
 	await prisma.dish.update({
-		where: { id: padThai.id },
+		where: { id: nasiUduk.id },
 		data: { imageId: dishUploadA.id },
 	});
 
 	await prisma.dish.update({
-		where: { id: classicBurger.id },
+		where: { id: sateAyam.id },
 		data: { imageId: dishUploadB.id },
 	});
 
@@ -588,8 +588,8 @@ async function main() {
 
 	await prisma.dishImage.createMany({
 		data: [
-			{ dishId: padThai.id, uploadId: dishUploadA.id },
-			{ dishId: classicBurger.id, uploadId: dishUploadB.id },
+			{ dishId: nasiUduk.id, uploadId: dishUploadA.id },
+			{ dishId: sateAyam.id, uploadId: dishUploadB.id },
 		],
 		skipDuplicates: true,
 	});
