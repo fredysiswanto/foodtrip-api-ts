@@ -1,8 +1,36 @@
 import { prisma } from "@/utils/prismaClient";
+import { UserRepository } from "../user/userRepository";
 import type { Cart } from "./cart.dto";
 
 class CartRepository {
+	private userRepository = new UserRepository();
+
 	async findAll(userId: string | undefined): Promise<Cart[] | null> {
+		const isAdmin = userId ? await this.userRepository.userIsAdmin(userId) : false;
+		if (userId && isAdmin) {
+			return prisma.cart.findMany({
+				// where: { userId },
+				include: {
+					user: {
+						select: { fullName: true, email: true },
+					},
+					restaurant: {
+						select: { name: true },
+					},
+					cartItems: {
+						select: {
+							id: true,
+							dishId: true,
+							quantity: true,
+							price: true,
+							notes: true,
+							createdAt: true,
+							updatedAt: true,
+						},
+					},
+				},
+			});
+		}
 		return prisma.cart.findMany({
 			where: { userId },
 			include: {
@@ -13,8 +41,14 @@ class CartRepository {
 					select: { name: true },
 				},
 				cartItems: {
-					include: {
-						dish: true,
+					select: {
+						id: true,
+						dishId: true,
+						quantity: true,
+						price: true,
+						notes: true,
+						createdAt: true,
+						updatedAt: true,
 					},
 				},
 			},

@@ -5,6 +5,7 @@ import { restaurantRouter } from "@/api/restaurant/restaurantRouter";
 import { uploadRouter } from "@/api/upload/uploadRouter";
 import { userRouter } from "@/api/user/userRouter";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
+import { cartController } from "../cart/cartController";
 import { cartRouter } from "../cart/cartRouter";
 
 export const adminRouter: Router = express.Router();
@@ -16,4 +17,4 @@ adminRouter.use("/dishes", dishRouter);
 adminRouter.use("/uploads", uploadRouter);
 adminRouter.use("/categories", categoryRouter);
 adminRouter.use("/users", userRouter);
-adminRouter.use("/carts", cartRouter);
+adminRouter.get("/carts", cartController.getCarts);

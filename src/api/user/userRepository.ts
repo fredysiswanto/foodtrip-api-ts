@@ -19,6 +19,14 @@ const mapPrismaUserToUser = (user: PrismaUser & { role: { name: string } }): Use
 });
 
 export class UserRepository {
+	async userIsAdmin(userId: string): Promise<boolean> {
+		const user = await prisma.user.findUnique({
+			where: { id: userId },
+			include: { role: { select: { name: true } } },
+		});
+		return user?.role.name === "SUPER_ADMIN";
+	}
+
 	async emailExists(email: string): Promise<boolean> {
 		const user = await prisma.user.findFirst({
 			where: { email },
