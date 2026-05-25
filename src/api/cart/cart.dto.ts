@@ -1,6 +1,7 @@
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 
 import { z } from "zod";
+import { DishSchema } from "@/api/dish/dishModel";
 import type { Prisma } from "@/generated/prisma/client";
 
 extendZodWithOpenApi(z);
@@ -12,6 +13,22 @@ export const CartSchema = z.object({
 	restaurantId: z.string().uuid(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
+});
+
+export const CartItemWithDishSchema = z.object({
+	id: z.string().uuid(),
+	cartId: z.string().uuid(),
+	dishId: z.string().uuid(),
+	quantity: z.number().int().positive(),
+	price: z.number().nonnegative(),
+	notes: z.string().optional(),
+	createdAt: z.date(),
+	updatedAt: z.date(),
+	dish: DishSchema,
+});
+
+export const CartWithItemsSchema = CartSchema.extend({
+	cartItems: z.array(CartItemWithDishSchema),
 });
 
 export const CartItemPayloadSchema = z.object({

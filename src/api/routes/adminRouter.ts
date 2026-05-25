@@ -6,7 +6,6 @@ import { uploadRouter } from "@/api/upload/uploadRouter";
 import { userRouter } from "@/api/user/userRouter";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
 import { cartController } from "../cart/cartController";
-import { cartRouter } from "../cart/cartRouter";
 
 export const adminRouter: Router = express.Router();
 
