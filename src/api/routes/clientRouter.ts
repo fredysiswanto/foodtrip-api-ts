@@ -2,6 +2,7 @@ import express, { type Router } from "express";
 import { authMiddleware } from "@/common/middleware/authMiddleware";
 import { cartController } from "../cart/cartController";
 import { dishController } from "../dish/dishController";
+import { orderController } from "../order/orderController";
 import { restaurantController } from "../restaurant/restaurantController";
 
 export const clientRouter: Router = express.Router();
@@ -15,3 +16,6 @@ clientRouter.get("/my-carts", cartController.getCarts);
 clientRouter.post("/add-cart", cartController.createCart);
 clientRouter.patch("/cart-items/:itemId", cartController.updateCartItem);
 clientRouter.delete("/cart-items/:itemId", cartController.deleteCartItem);
+clientRouter.get("/my-orders", orderController.getOrders);
+clientRouter.get("/orders/:id", orderController.getOrderById);
+clientRouter.post("/orders", orderController.createOrder);

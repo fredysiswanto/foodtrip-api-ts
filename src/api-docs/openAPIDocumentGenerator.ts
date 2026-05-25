@@ -4,6 +4,7 @@ import { cartRegistry } from "@/api/cart/cartRouter";
 import { categoryRegistry } from "@/api/category/categoryRouter";
 import { dishRegistry } from "@/api/dish/dishRouter";
 import { healthCheckRegistry } from "@/api/healthCheck/healthCheckRouter";
+import { orderRegistry } from "@/api/order/orderRouter";
 import { restaurantRegistry } from "@/api/restaurant/restaurantRouter";
 import { uploadRegistry } from "@/api/upload/uploadRouter";
 import { userRegistry } from "@/api/user/userRouter";
@@ -17,6 +18,7 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		userRegistry,
 		categoryRegistry,
 		cartRegistry,
+		orderRegistry,
 		dishRegistry,
 		restaurantRegistry,
 		uploadRegistry,
