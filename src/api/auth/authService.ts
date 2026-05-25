@@ -1,8 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
+import type { User } from "@/api/user/userModel";
 import { UserRepository } from "@/api/user/userRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { env } from "@/common/utils/envConfig";
+import type { RegisterRequest } from "./authModel";
 import { AuthRepository } from "./authRepository";
 
 export type AuthTokenResponse = {
@@ -69,6 +71,37 @@ export class AuthService {
 		} catch {
 			return ServiceResponse.failure<JwtPayload | null>("Invalid or expired token.", null, StatusCodes.UNAUTHORIZED);
 		}
+	}
+
+	async register(payload: RegisterRequest): Promise<ServiceResponse<User | null>> {
+		// Check if email already exists
+		const existingEmail = await this.userRepository.emailExists(payload.email);
+		if (existingEmail) {
+			return ServiceResponse.failure<User | null>("User with this email already exists.", null, StatusCodes.CONFLICT);
+		}
+
+		// Check if phone already exists
+		const existingPhone = await this.userRepository.phoneExists(payload.phone);
+		if (existingPhone) {
+			return ServiceResponse.failure<User | null>(
+				"User with this phone number already exists.",
+				null,
+				StatusCodes.CONFLICT,
+			);
+		}
+
+		const user = await this.userRepository.createCustomer({
+			email: payload.email,
+			passwordHash: await this.authRepository.createPasswordHash(payload.password),
+			fullName: payload.fullName,
+			phone: payload.phone,
+		});
+
+		if (!user) {
+			return ServiceResponse.failure<User | null>("Failed to create user.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+
+		return ServiceResponse.success<User | null>("User registered successfully.", user, StatusCodes.CREATED);
 	}
 }
 

@@ -23,3 +23,11 @@ export const UserSchema = z.object({
 export const GetUserSchema = z.object({
 	params: z.object({ id: commonValidations.id }),
 });
+
+export type UserRegister = z.infer<typeof UserRegisterSchema>;
+export const UserRegisterSchema = z.object({
+	email: z.string().email(),
+	password: z.string().min(6),
+	fullName: z.string().min(1),
+	phone: z.string().optional(),
+});

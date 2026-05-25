@@ -13,6 +13,10 @@ const PASSWORD_SALT = process.env.PASSWORD_SALT || "random_salt_value";
 const createPasswordHash = (password: string) => scryptSync(password, PASSWORD_SALT, HASH_BYTE_SIZE).toString("hex");
 
 export class AuthRepository {
+	async createPasswordHash(password: string): Promise<string> {
+		return createPasswordHash(password);
+	}
+
 	async findByEmail(email: string): Promise<AuthRecord | null> {
 		const user = await prisma.user.findUnique({
 			where: { email },

@@ -15,7 +15,7 @@ export class DishRepository {
 		meta: PaginationMeta;
 	}> {
 		const { page, limit, skip } = getPagination(query);
-		const where = buildSearch(query.search, ["name"]);
+		const where = buildSearch(query.search, ["name", "restaurantId"]);
 		const orderBy = buildOrderBy(query.sortBy, query.sortOrder, ["name", "price", "createdAt"]);
 		const [dishes, totalItems] = await Promise.all([
 			prisma.dish.findMany({
@@ -32,7 +32,7 @@ export class DishRepository {
 				take: limit,
 				orderBy,
 			}),
-			prisma.dish.count(),
+			prisma.dish.count({ where }),
 		]);
 
 		return createPaginationResponse(dishes, totalItems, page, limit);

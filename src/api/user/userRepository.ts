@@ -19,6 +19,38 @@ const mapPrismaUserToUser = (user: PrismaUser & { role: { name: string } }): Use
 });
 
 export class UserRepository {
+	async userIsAdmin(userId: string): Promise<boolean> {
+		const user = await prisma.user.findUnique({
+			where: { id: userId },
+			include: { role: { select: { name: true } } },
+		});
+		return user?.role.name === "SUPER_ADMIN";
+	}
+
+	async emailExists(email: string): Promise<boolean> {
+		const user = await prisma.user.findFirst({
+			where: { email },
+		});
+		return !!user;
+	}
+
+	async phoneExists(phone: string): Promise<boolean> {
+		const user = await prisma.user.findFirst({
+			where: { phone },
+		});
+		return !!user;
+	}
+
+	async findByEmailOrPhone(email: string, phone?: string): Promise<User | null> {
+		const user = await prisma.user.findFirst({
+			where: {
+				OR: [{ email }, ...(phone ? [{ phone }] : [])],
+			},
+			include: { role: { select: { name: true } } },
+		});
+		return user ? mapPrismaUserToUser(user) : null;
+	}
+
 	async findAllAsync(): Promise<User[]> {
 		const users = await prisma.user.findMany({
 			orderBy: { createdAt: "asc" },
@@ -35,5 +67,32 @@ export class UserRepository {
 		});
 
 		return user ? mapPrismaUserToUser(user) : null;
+	}
+
+	async createCustomer(data: {
+		email: string;
+		fullName: string;
+		phone: string;
+		passwordHash: string;
+	}): Promise<User | null> {
+		// Get or create CUSTOMER role
+		const customerRole = await prisma.role.upsert({
+			where: { name: "CUSTOMER" },
+			update: {},
+			create: { name: "CUSTOMER", description: "Customer role" },
+		});
+
+		const newUser = await prisma.user.create({
+			data: {
+				email: data.email,
+				fullName: data.fullName,
+				phone: data.phone,
+				passwordHash: data.passwordHash,
+				roleId: customerRole.id,
+			},
+			include: { role: { select: { name: true } } },
+		});
+
+		return mapPrismaUserToUser(newUser);
 	}
 }
