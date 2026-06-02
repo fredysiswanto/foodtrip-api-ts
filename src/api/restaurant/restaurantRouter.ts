@@ -5,6 +5,7 @@ import { restaurantController } from "@/api/restaurant/restaurantController";
 import { CreateRestaurantSchema, RestaurantSchema, UpdateRestaurantSchema } from "@/api/restaurant/restaurantModel";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
+import { restaurantAccessMiddleware } from "@/common/middleware/restaurantAccessMiddleware";
 import { commonValidations } from "@/common/utils/commonValidation";
 import { validateRequest } from "@/common/utils/httpHandlers";
 
@@ -84,7 +85,7 @@ restaurantRouter.post(
 );
 restaurantRouter.patch(
 	"/:restaurantId",
-	adminAuthMiddleware,
+	restaurantAccessMiddleware(["OWNER"]),
 	validateRequest(z.object({ params: z.object({ restaurantId: commonValidations.id }), body: UpdateRestaurantSchema })),
 	restaurantController.updateRestaurant,
 );

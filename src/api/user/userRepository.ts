@@ -1,6 +1,6 @@
 import type { User } from "@/api/user/userModel";
 import { prisma } from "@/common/utils/prismaClient";
-import type { Prisma } from "@/generated/prisma/client";
+import type { Prisma, RestaurantRole } from "@/generated/prisma/client";
 
 type PrismaUser = Prisma.UserModel;
 
@@ -25,6 +25,57 @@ export class UserRepository {
 			include: { role: { select: { name: true } } },
 		});
 		return user?.role.name === "SUPER_ADMIN";
+	}
+
+	async userHasRestaurantRole(userId: string, restaurantId: string, roles: RestaurantRole[]): Promise<boolean> {
+		const restaurantUser = await prisma.restaurantUser.findFirst({
+			where: {
+				userId,
+				restaurantId,
+				restaurantRole: { in: roles },
+			},
+		});
+
+		return !!restaurantUser;
+	}
+
+	async userIsOwner(userId: string): Promise<boolean> {
+		const restaurantUser = await prisma.restaurantUser.findFirst({
+			where: {
+				userId,
+				restaurantRole: "OWNER",
+			},
+		});
+
+		return !!restaurantUser;
+	}
+
+	async userOwnedRestaurantIds(userId: string): Promise<string[]> {
+		const ownedRestaurants = await prisma.restaurantUser.findMany({
+			where: {
+				userId,
+				restaurantRole: "OWNER",
+			},
+			select: { restaurantId: true },
+		});
+
+		return ownedRestaurants.map((restaurantUser) => restaurantUser.restaurantId);
+	}
+
+	async userIsOwnerOfRestaurant(userId: string, restaurantId: string): Promise<boolean> {
+		return this.userHasRestaurantRole(userId, restaurantId, ["OWNER"]);
+	}
+
+	async userIsStaffOfRestaurant(userId: string, restaurantId: string): Promise<boolean> {
+		return this.userHasRestaurantRole(userId, restaurantId, ["STAFF"]);
+	}
+
+	async userCanAccessRestaurant(userId: string, restaurantId: string): Promise<boolean> {
+		if (await this.userIsAdmin(userId)) {
+			return true;
+		}
+
+		return this.userHasRestaurantRole(userId, restaurantId, ["OWNER", "ADMIN", "STAFF"]);
 	}
 
 	async emailExists(email: string): Promise<boolean> {

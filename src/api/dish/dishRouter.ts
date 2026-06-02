@@ -5,6 +5,7 @@ import { dishController } from "@/api/dish/dishController";
 import { CreateDishSchema, DishSchema, UpdateDishSchema } from "@/api/dish/dishModel";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
+import { restaurantAccessMiddleware } from "@/common/middleware/restaurantAccessMiddleware";
 import { commonValidations } from "@/common/utils/commonValidation";
 import { validateRequest } from "@/common/utils/httpHandlers";
 
@@ -85,7 +86,7 @@ dishRouter.get(
 );
 dishRouter.post(
 	"/",
-	adminAuthMiddleware,
+	restaurantAccessMiddleware(["OWNER", "ADMIN", "STAFF"]),
 	validateRequest(z.object({ body: CreateDishSchema })),
 	dishController.createDish,
 );
