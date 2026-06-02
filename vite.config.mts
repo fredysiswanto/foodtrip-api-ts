@@ -8,6 +8,10 @@ export default defineConfig({
 		},
 		globals: true,
 		restoreMocks: true,
+		env:{
+			NODE_ENV: "development",
+		}
 	},
+	
 	plugins: [tsconfigPaths()],
 });
