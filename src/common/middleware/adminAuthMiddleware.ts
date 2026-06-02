@@ -27,7 +27,6 @@ export const adminAuthMiddleware: RequestHandler = async (req: Request, res: Res
 		const userRepository = new UserRepository();
 		const user = await userRepository.findByIdAsync(payload.userId);
 
-
 		if (!user || !ALLOWED_ADMIN_ROLES.includes(user.roleName)) {
 			const serviceResponse = ServiceResponse.failure("Administrator access required.", null, StatusCodes.FORBIDDEN);
 			return res.status(serviceResponse.statusCode).send(serviceResponse);

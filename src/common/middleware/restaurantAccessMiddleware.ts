@@ -1,11 +1,11 @@
-import type { Request, RequestHandler, Response } from "express";
+import type { Request, RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "@/api/auth/authService";
 import { UserRepository } from "@/api/user/userRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { env } from "@/common/utils/envConfig";
-import type { Prisma, RestaurantRole } from "@/generated/prisma/client";
+import type { RestaurantRole } from "@/generated/prisma/client";
 
 const getRestaurantIdFromRequest = (req: Request): string | null => {
 	return (
