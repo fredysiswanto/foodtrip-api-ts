@@ -87,7 +87,8 @@ jobs:
           key: ${{ secrets.VPS_PRIVATE_KEY }}
           port: ${{ secrets.VPS_SSH_PORT || '22' }}
           source: "scripts/deploy.sh"
-          target: /tmp/
+          target: "/tmp/"
+          strip_components: 1
       - name: Run deploy on VPS
         uses: appleboy/ssh-action@v0.1.7
         with:
