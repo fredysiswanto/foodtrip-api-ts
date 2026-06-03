@@ -44,6 +44,14 @@ jobs:
           cp package.json pnpm-lock.yaml ecosystem.config.cjs release/
           cp -r prisma release/
           cp -r dist release/
+          # Include generated Prisma client
+          if [ -d .prisma ]; then
+            cp -r .prisma release/
+          else
+            echo "Warning: .prisma/ not found, generating..."
+            pnpm prisma generate
+            cp -r .prisma release/
+          fi
           tar -C release -czf foodtrip-release.tar.gz .
       - uses: actions/upload-artifact@v4
         with:

@@ -29,13 +29,15 @@ if [ -d "$SHARED_DIR/public/uploads" ]; then
 fi
 
 cd "$RELEASE_DIR"
-pnpm approve-builds --filter prisma --filter @prisma/engines
 pnpm install --prod --frozen-lockfile
 
 ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"
 cd "$CURRENT_LINK"
 
-pnpm prisma migrate deploy
+# Run migrations
+pnpm exec prisma migrate deploy
+
+# Reload or start PM2 app
 if ! pm2 reload ecosystem.config.cjs --env production; then
   pm2 start ecosystem.config.cjs --env production
 fi
