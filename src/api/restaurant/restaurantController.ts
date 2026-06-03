@@ -10,6 +10,13 @@ class RestaurantController {
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
+	public getMyRestaurants: RequestHandler = async (req: Request, res: Response) => {
+		const userId = (req as Request & { user?: { userId: string } }).user?.userId;
+		const query = req.query;
+		const serviceResponse = await restaurantService.findAllForUser(userId, query);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
+
 	public getRestaurantById: RequestHandler = async (req: Request, res: Response) => {
 		const { id } = req.params;
 		const serviceResponse = await restaurantService.findById(id);

@@ -6,7 +6,7 @@ import { UserRepository } from "@/api/user/userRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { env } from "@/common/utils/envConfig";
 
-const ALLOWED_ADMIN_ROLES = ["SUPER_ADMIN", "OWNER", "ADMIN"];
+const ALLOWED_ADMIN_ROLES = ["SUPER_ADMIN"];
 
 export const adminAuthMiddleware: RequestHandler = async (req: Request, res: Response, next) => {
 	const authHeader = req.headers.authorization;
