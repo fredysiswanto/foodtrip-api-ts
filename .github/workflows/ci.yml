@@ -41,7 +41,7 @@ jobs:
       - run: pnpm build
       - run: |
           mkdir -p release
-          cp package.json pnpm-lock.yaml ecosystem.config.cjs release/
+          cp package.json pnpm-lock.yaml ecosystem.config.cjs prisma.config.ts release/
           cp -r prisma release/
           cp -r dist release/
           # Include generated Prisma client (configured in schema.prisma)
