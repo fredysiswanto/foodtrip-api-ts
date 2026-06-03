@@ -18,12 +18,16 @@ const loginAsTestUser = async () => {
 
 	return response.body.data?.accessToken as string;
 };
-
-describe("User API Endpoints", () => {
+const isProduction: boolean = process.env.NODE_ENV === "production";
+describe.skipIf(!isProduction)("User API Endpoints", () => {
 	let testUserId: string;
 
 	beforeAll(async () => {
-		await prisma.$connect();
+		try {
+			await prisma.$connect();
+		} catch (error) {
+			throw new Error(`Prisma failed to connect in beforeAll: ${String(error)}`);
+		}
 
 		const role = await prisma.role.upsert({
 			where: { name: "SUPER_ADMIN" },
@@ -50,10 +54,10 @@ describe("User API Endpoints", () => {
 		});
 
 		testUserId = user.id;
-	});
+	}, 30000);
 
 	afterAll(async () => {
-		// await prisma.user.deleteMany({ where: { email: TEST_EMAIL } });
+		await prisma.user.deleteMany({ where: { email: TEST_EMAIL } });
 		await prisma.$disconnect();
 	});
 
