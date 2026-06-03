@@ -8,6 +8,9 @@ on:
     branches:
       - master
 
+env:
+  DEPLOY_PATH: /home/ubuntu/foodtrip-api-ts
+
 jobs:
   setup:
     name: Setup and Install
@@ -28,13 +31,24 @@ jobs:
       - run: biome ci .
 
   build:
-    name: Build
+    name: Build and Package
     needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: ./.github/actions/setup-pnpm
+      - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - run: |
+          mkdir -p release
+          cp package.json pnpm-lock.yaml ecosystem.config.cjs release/
+          cp -r prisma release/
+          cp -r dist release/
+          tar -C release -czf foodtrip-release.tar.gz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: foodtrip-api-ts-release
+          path: foodtrip-release.tar.gz
 
   test:
     name: Test
@@ -44,6 +58,37 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: ./.github/actions/setup-pnpm
       - run: pnpm test
+
+  deploy:
+    name: Deploy to VPS
+    needs: [build, test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: foodtrip-api-ts-release
+          path: ./release
+      - name: Upload release artifact and deploy script
+        uses: appleboy/scp-action@v0.1.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || '22' }}
+          source: ./release/foodtrip-release.tar.gz,scripts/deploy.sh
+          target: /tmp/
+      - name: Run deploy on VPS
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || '22' }}
+          script: |
+            chmod +x /tmp/deploy.sh
+            bash /tmp/deploy.sh /tmp/foodtrip-release.tar.gz "${{ env.DEPLOY_PATH }}"
 
   # docker:
   #   name: Docker Build and Push

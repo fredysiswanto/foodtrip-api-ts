@@ -57,6 +57,41 @@ For a visual guide, watch the [video demo](https://github.com/user-attachments/a
 - Building: `pnpm build`
 - Production Mode: Set `NODE_ENV="production"` in `.env` then `pnpm build && pnpm start:prod`
 
+## 🚀 Production Deployment
+
+This project supports a release-based deployment flow to a VPS at `/home/ubuntu/foodtrip-api-ts`.
+
+The GitHub Actions workflow now builds a release artifact, uploads it to the VPS, extracts it into `releases/<timestamp>`, updates the `current` symlink, runs `pnpm prisma migrate deploy`, and reloads the app with PM2.
+
+The workflow uses `appleboy/scp-action` and `appleboy/ssh-action` to transfer files and execute the remote deploy script.
+
+Deployment only runs on `master` branch pushes.
+
+### GitHub Actions secrets
+
+- `VPS_HOST`
+- `VPS_USER`
+- `VPS_PRIVATE_KEY`
+- `VPS_SSH_PORT` (optional, default `22`)
+
+### Server layout
+
+- `/home/ubuntu/foodtrip-api-ts/releases/` — each deployed release
+- `/home/ubuntu/foodtrip-api-ts/current` — symlink ke release aktif
+- `/home/ubuntu/foodtrip-api-ts/shared/.env` — environment variables runtime
+- `/home/ubuntu/foodtrip-api-ts/shared/logs/` — PM2 logs
+- `/home/ubuntu/foodtrip-api-ts/shared/public/uploads/` — file upload persisten
+
+This repository also contains helper scripts for server-side deployment:
+- `scripts/deploy.sh` — deploy new release artifact on VPS
+- `scripts/rollback.sh` — switch `current` back to a previous release and reload PM2
+
+### Server requirements
+
+- `pnpm` tersedia secara global
+- `pm2` tersedia secara global
+- `shared/.env` sudah dibuat sebelum deploy pertama
+
 ## 📘 Documentation
 
 Detailed project documentation is available in the `docs/` folder:
