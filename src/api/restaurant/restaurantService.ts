@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes";
+import { UserRepository } from "@/api/user/userRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { Prisma } from "@/generated/prisma/client";
 import type { CreateRestaurantInput } from "./restaurantModel";
@@ -16,6 +17,7 @@ export interface GetRestaurantsQuery {
 
 export class RestaurantService {
 	private repository = new RestaurantRepository();
+	private userRepository = new UserRepository();
 	// private async validateRelations(data: Partial<CreateRestaurantInput>): Promise<string | null> {
 	// 	if (data.restaurantId && !(await this.repository.restaurantExists(data.restaurantId))) {
 	// 		return "The provided restaurantId does not exist.";
@@ -45,6 +47,30 @@ export class RestaurantService {
 	> {
 		try {
 			const { data, meta } = await this.repository.findAll(query);
+
+			return ServiceResponse.paginatedSuccess("Restaurants found.", data, meta);
+		} catch (error) {
+			return ServiceResponse.failure(
+				`Unable to retrieve restaurants. ${error instanceof Error ? error.message : "Unknown error"}`,
+				null,
+				StatusCodes.NOT_FOUND,
+			);
+		}
+	}
+
+	async findAllForUser(
+		userId: string | undefined,
+		query: GetRestaurantsQuery,
+	): Promise<
+		ServiceResponse<Pick<Restaurant, "id" | "name" | "slug" | "address" | "status" | "isOpen" | "createdAt">[] | null>
+	> {
+		if (!userId) {
+			return ServiceResponse.failure("User ID is required.", null, StatusCodes.BAD_REQUEST);
+		}
+
+		try {
+			const restaurantIds = await this.userRepository.userRestaurantIds(userId, ["OWNER", "ADMIN", "STAFF"]);
+			const { data, meta } = await this.repository.findAll(query, restaurantIds);
 
 			return ServiceResponse.paginatedSuccess("Restaurants found.", data, meta);
 		} catch (error) {

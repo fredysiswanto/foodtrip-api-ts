@@ -62,6 +62,18 @@ export class UserRepository {
 		return ownedRestaurants.map((restaurantUser) => restaurantUser.restaurantId);
 	}
 
+	async userRestaurantIds(userId: string, roles: RestaurantRole[]): Promise<string[]> {
+		const restaurants = await prisma.restaurantUser.findMany({
+			where: {
+				userId,
+				restaurantRole: { in: roles },
+			},
+			select: { restaurantId: true },
+		});
+
+		return restaurants.map((restaurantUser) => restaurantUser.restaurantId);
+	}
+
 	async userIsOwnerOfRestaurant(userId: string, restaurantId: string): Promise<boolean> {
 		return this.userHasRestaurantRole(userId, restaurantId, ["OWNER"]);
 	}

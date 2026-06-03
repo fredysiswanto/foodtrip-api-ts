@@ -5,7 +5,8 @@ import { dishController } from "@/api/dish/dishController";
 import { CreateDishSchema, DishSchema, UpdateDishSchema } from "@/api/dish/dishModel";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
-import { restaurantAccessMiddleware } from "@/common/middleware/restaurantAccessMiddleware";
+import { authMiddleware } from "@/common/middleware/authMiddleware";
+import { dishAccessMiddleware, restaurantAccessMiddleware } from "@/common/middleware/restaurantAccessMiddleware";
 import { commonValidations } from "@/common/utils/commonValidation";
 import { validateRequest } from "@/common/utils/httpHandlers";
 
@@ -77,30 +78,31 @@ dishRegistry.registerPath({
 	responses: createApiResponse(z.null(), "Dish deleted successfully"),
 });
 
-dishRouter.get("/", dishController.getDishes);
+dishRouter.get("/", authMiddleware, dishController.getDishes);
 
 dishRouter.get(
 	"/:id",
+	dishAccessMiddleware(["OWNER", "ADMIN", "STAFF"]),
 	validateRequest(z.object({ params: z.object({ id: commonValidations.id }) })),
 	dishController.getDishById,
 );
 dishRouter.post(
 	"/",
-	restaurantAccessMiddleware(["OWNER", "ADMIN", "STAFF"]),
+	restaurantAccessMiddleware(["OWNER", "ADMIN"]),
 	validateRequest(z.object({ body: CreateDishSchema })),
 	dishController.createDish,
 );
 
 dishRouter.patch(
 	"/:id",
-	adminAuthMiddleware,
+	dishAccessMiddleware(["OWNER", "ADMIN"]),
 	validateRequest(z.object({ params: z.object({ id: commonValidations.id }), body: UpdateDishSchema })),
 	dishController.updateDish,
 );
 
 dishRouter.delete(
 	"/:id",
-	adminAuthMiddleware,
+	dishAccessMiddleware(["OWNER", "ADMIN"]),
 	validateRequest(z.object({ params: z.object({ id: commonValidations.id }) })),
 	dishController.deleteDish,
 );

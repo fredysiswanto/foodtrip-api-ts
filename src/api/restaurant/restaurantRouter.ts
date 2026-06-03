@@ -5,6 +5,7 @@ import { restaurantController } from "@/api/restaurant/restaurantController";
 import { CreateRestaurantSchema, RestaurantSchema, UpdateRestaurantSchema } from "@/api/restaurant/restaurantModel";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
+import { authMiddleware } from "@/common/middleware/authMiddleware";
 import { restaurantAccessMiddleware } from "@/common/middleware/restaurantAccessMiddleware";
 import { commonValidations } from "@/common/utils/commonValidation";
 import { validateRequest } from "@/common/utils/httpHandlers";
@@ -69,10 +70,13 @@ restaurantRegistry.registerPath({
 	responses: createApiResponse(RestaurantSchema, "Restaurant updated successfully"),
 });
 
-restaurantRouter.get("/", restaurantController.getRestaurants);
+restaurantRouter.get("/", adminAuthMiddleware, restaurantController.getRestaurants);
+
+restaurantRouter.get("/my", authMiddleware, restaurantController.getMyRestaurants);
 
 restaurantRouter.get(
 	"/:restaurantId",
+	restaurantAccessMiddleware(["OWNER", "ADMIN", "STAFF"]),
 	validateRequest(z.object({ params: z.object({ restaurantId: commonValidations.id }) })),
 	restaurantController.getRestaurantById,
 );

@@ -29,12 +29,24 @@ export type UpdateRestaurantData = Partial<CreateRestaurantData> & {
 };
 
 export class RestaurantRepository {
-	async findAll(query: GetRestaurantsQuery): Promise<{
+	async findAll(
+		query: GetRestaurantsQuery,
+		restaurantIds?: string[],
+	): Promise<{
 		data: Pick<Restaurant, "id" | "name" | "slug" | "address" | "status" | "isOpen" | "createdAt">[];
 		meta: PaginationMeta;
 	}> {
 		const { page, limit, skip } = getPagination(query);
-		const where = buildSearch(query.search, ["name"]);
+		const where: Record<string, unknown> = buildSearch(query.search, ["name"]);
+
+		if (restaurantIds) {
+			where.id = { in: restaurantIds };
+		}
+
+		if (restaurantIds && restaurantIds.length === 0) {
+			return createPaginationResponse([], 0, page, limit);
+		}
+
 		const orderBy = buildOrderBy(query.sortBy, query.sortOrder, ["name", "createdAt"]);
 		const [restaurants, totalItems] = await Promise.all([
 			prisma.restaurant.findMany({
@@ -52,7 +64,7 @@ export class RestaurantRepository {
 				take: limit,
 				orderBy,
 			}),
-			prisma.restaurant.count(),
+			prisma.restaurant.count({ where }),
 		]);
 
 		return createPaginationResponse(restaurants, totalItems, page, limit);

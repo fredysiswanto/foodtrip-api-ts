@@ -62,9 +62,10 @@ uploadRegistry.registerPath({
 });
 
 uploadRouter.post("/", adminAuthMiddleware, uploadMiddleware.single("file"), uploadController.create);
-uploadRouter.get("/", uploadController.getUploads);
+uploadRouter.get("/", adminAuthMiddleware, uploadController.getUploads);
 uploadRouter.get(
 	"/:id",
+	adminAuthMiddleware,
 	validateRequest(z.object({ params: z.object({ id: commonValidations.id }) })),
 	uploadController.getUploadById,
 );

@@ -10,12 +10,10 @@ import { cartController } from "../cart/cartController";
 
 export const adminRouter: Router = express.Router();
 
-adminRouter.use(adminAuthMiddleware);
-
 adminRouter.use("/restaurants", restaurantRouter);
 adminRouter.use("/dishes", dishRouter);
 adminRouter.use("/uploads", uploadRouter);
 adminRouter.use("/categories", categoryRouter);
 adminRouter.use("/users", userRouter);
 adminRouter.use("/orders", orderRouter);
-adminRouter.get("/carts", cartController.getCarts);
+adminRouter.get("/carts", adminAuthMiddleware, cartController.getCarts);
