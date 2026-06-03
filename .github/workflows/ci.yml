@@ -1,105 +1,390 @@
-name: CI
+# name: CI
+
+# on:
+#   push:
+#     branches:
+#       - master
+#   pull_request:
+#     branches:
+#       - master
+
+# env:
+#   DEPLOY_PATH: /home/ubuntu/foodtrip-api-ts
+
+# jobs:
+#   setup:
+#     name: Setup and Install
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+#       - name: Setup pnpm
+#         uses: ./.github/actions/setup-pnpm
+
+#   quality:
+#     name: Code Quality
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+#       - uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2
+#         with:
+#           version: latest
+#       - run: biome ci .
+
+#   build:
+#     name: Build and Package
+#     needs: setup
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+#       - uses: ./.github/actions/setup-pnpm
+#       - run: pnpm install --frozen-lockfile
+#       - run: pnpm build
+#       - run: |
+#           mkdir -p release
+#           cp package.json pnpm-lock.yaml ecosystem.config.cjs prisma.config.ts release/
+#           cp -r prisma release/
+#           cp -r dist release/
+#           # Include generated Prisma client (configured in schema.prisma)
+#           if [ -d src/generated/prisma ]; then
+#             mkdir -p release/src/generated
+#             cp -r src/generated/prisma release/src/generated/
+#           else
+#             echo "Error: src/generated/prisma not found"
+#             exit 1
+#           fi
+#           tar -C release -czf foodtrip-release.tar.gz .
+#       - uses: actions/upload-artifact@v4
+#         with:
+#           name: foodtrip-api-ts-release
+#           path: foodtrip-release.tar.gz
+
+#   test:
+#     name: Test
+#     needs: setup
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+#       - uses: ./.github/actions/setup-pnpm
+#       - run: pnpm test
+
+#   deploy:
+#     name: Deploy to VPS
+#     needs: [build, test]
+#     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+#       - uses: actions/download-artifact@v4
+#         with:
+#           name: foodtrip-api-ts-release
+#           path: ./release
+#       - name: Upload release artifact
+#         uses: appleboy/scp-action@v0.1.5
+#         with:
+#           host: ${{ secrets.VPS_HOST }}
+#           username: ${{ secrets.VPS_USER }}
+#           key: ${{ secrets.VPS_PRIVATE_KEY }}
+#           port: ${{ secrets.VPS_SSH_PORT || '22' }}
+#           source: "./release/foodtrip-release.tar.gz"
+#           target: /tmp/
+#           # debug where folder is being uploaded
+
+#       - name: Upload deploy script
+#         uses: appleboy/scp-action@v0.1.5
+#         with:
+#           host: ${{ secrets.VPS_HOST }}
+#           username: ${{ secrets.VPS_USER }}
+#           key: ${{ secrets.VPS_PRIVATE_KEY }}
+#           port: ${{ secrets.VPS_SSH_PORT || '22' }}
+#           source: "scripts/deploy.sh"
+#           target: /tmp/
+#       - name: Run deploy on VPS
+#         uses: appleboy/ssh-action@v0.1.7
+#         with:
+#           host: ${{ secrets.VPS_HOST }}
+#           username: ${{ secrets.VPS_USER }}
+#           key: ${{ secrets.VPS_PRIVATE_KEY }}
+#           port: ${{ secrets.VPS_SSH_PORT || '22' }}
+#           script: |
+#             chmod +x /tmp/scripts/deploy.sh
+#             bash /tmp/scripts/deploy.sh /tmp/release/foodtrip-release.tar.gz "${{ env.DEPLOY_PATH }}"
+
+#   # docker:
+#   #   name: Docker Build and Push
+#   #   needs: [build, test]
+#   #   runs-on: ubuntu-latest
+#   #   permissions:
+#   #     contents: read
+#   #     packages: write
+#   #   steps:
+#   #     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+#   #       with:
+#   #         fetch-depth: 0 # Fetch all history for proper versioning
+#   #     # Set up Docker Buildx
+#   #     - name: Set up Docker Buildx
+#   #       uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+#   #     # Login to GitHub Container Registry
+#   #     - name: Login to GitHub Container Registry
+#   #       uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+#   #       with:
+#   #         registry: ghcr.io
+#   #         username: ${{ github.actor }}
+#   #         password: ${{ secrets.GITHUB_TOKEN }}
+#   #     # Generate Docker metadata (tags, labels)
+#   #     - name: Docker metadata
+#   #       id: meta
+#   #       uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
+#   #       with:
+#   #         images: ghcr.io/${{ github.repository }}
+#   #         tags: |
+#   #           type=raw,value=${{ github.sha }}
+#   #           type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
+#   #           type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+#   #           type=semver,pattern={{major}}.{{minor}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+#   #           type=ref,event=branch
+#   #           type=ref,event=pr
+#   #           type=sha,format=long
+#   #     # Build and push
+#   #     - name: Build and push
+#   #       uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+#   #       with:
+#   #         context: .
+#   #         push: ${{ github.event_name != 'pull_request' }}
+#   #         tags: ${{ steps.meta.outputs.tags }}
+#   #         labels: ${{ steps.meta.outputs.labels }}
+#   #         cache-from: |
+#   #           type=gha,scope=${{ github.ref_name }}-${{ github.job }}
+#   #           type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
+#   #         cache-to: |
+#   #           type=gha,mode=max,scope=${{ github.ref_name }}-${{ github.job }}
+#   #           type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
+
+#   summary:
+#     name: Workflow Summary
+#     needs: [setup, quality, build, test]
+#     runs-on: ubuntu-latest
+#     if: always() # Run even if previous jobs fail
+#     steps:
+#       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+#       - name: Generate CI Summary
+#         run: |
+#           echo "# 📋 CI Workflow Summary" >> $GITHUB_STEP_SUMMARY
+#           echo "" >> $GITHUB_STEP_SUMMARY
+
+#           # Build info
+#           echo "" >> $GITHUB_STEP_SUMMARY
+#           echo "## 🔨 Build Information" >> $GITHUB_STEP_SUMMARY
+#           echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+#           echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+#           echo "| **Repository** | ${{ github.repository }} |" >> $GITHUB_STEP_SUMMARY
+#           echo "| **Branch/Tag** | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+#           echo "| **Commit** | [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) |" >> $GITHUB_STEP_SUMMARY
+#           echo "| **Triggered by** | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
+#           echo "| **Workflow Run** | [View Details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |" >> $GITHUB_STEP_SUMMARY
+
+#           # Docker image info (when applicable)
+#           # if [[ "${{ needs.docker.result }}" == "success" && "${{ github.event_name }}" != "pull_request" ]]; then
+#           #   echo "" >> $GITHUB_STEP_SUMMARY
+#           #   echo "## 🐳 Docker Image" >> $GITHUB_STEP_SUMMARY
+#           #   echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+#           #   echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+#           #   echo "| **Repository** | ghcr.io/${{ github.repository }} |" >> $GITHUB_STEP_SUMMARY
+#           #   echo "| **Latest Tag** | ghcr.io/${{ github.repository }}:${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+#           #   echo "| **Package URL** | [View on GitHub](https://github.com/${{ github.repository }}/pkgs/container/$(echo '${{ github.repository }}' | cut -d'/' -f2)) |" >> $GITHUB_STEP_SUMMARY
+#           # fi
+
+name: CI/CD
 
 on:
   push:
     branches:
       - master
+
   pull_request:
     branches:
       - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: foodtrip-production
+  cancel-in-progress: true
 
 env:
   DEPLOY_PATH: /home/ubuntu/foodtrip-api-ts
 
 jobs:
-  setup:
-    name: Setup and Install
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - name: Setup pnpm
-        uses: ./.github/actions/setup-pnpm
-
   quality:
     name: Code Quality
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2
-        with:
-          version: latest
-      - run: biome ci .
 
-  build:
-    name: Build and Package
-    needs: setup
-    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - uses: ./.github/actions/setup-pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-      - run: |
-          mkdir -p release
-          cp package.json pnpm-lock.yaml ecosystem.config.cjs prisma.config.ts release/
-          cp -r prisma release/
-          cp -r dist release/
-          # Include generated Prisma client (configured in schema.prisma)
-          if [ -d src/generated/prisma ]; then
-            mkdir -p release/src/generated
-            cp -r src/generated/prisma release/src/generated/
-          else
-            echo "Error: src/generated/prisma not found"
-            exit 1
-          fi
-          tar -C release -czf foodtrip-release.tar.gz .
-      - uses: actions/upload-artifact@v4
-        with:
-          name: foodtrip-api-ts-release
-          path: foodtrip-release.tar.gz
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PNPM
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Biome
+        run: pnpm biome ci .
+
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PNPM
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type Check
+        run: pnpm exec tsc --noEmit
 
   test:
     name: Test
-    needs: setup
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - uses: ./.github/actions/setup-pnpm
-      - run: pnpm test
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PNPM
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm prisma generate
+
+      - name: Run Tests
+        run: pnpm test
+
+  build:
+    name: Build and Package
+
+    runs-on: ubuntu-latest
+
+    needs:
+      - quality
+      - typecheck
+      - test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PNPM
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm prisma generate
+
+      - name: Build
+        run: pnpm build
+
+      - name: Create Release Package
+        run: |
+          mkdir -p release
+
+          cp package.json release/
+          cp pnpm-lock.yaml release/
+          cp ecosystem.config.cjs release/
+
+          if [ -f prisma.config.ts ]; then
+            cp prisma.config.ts release/
+          fi
+
+          cp -r prisma release/
+          cp -r dist release/
+
+          # Custom Prisma output
+          if [ -d src/generated/prisma ]; then
+            mkdir -p release/src/generated
+            cp -r src/generated/prisma release/src/generated/
+          fi
+
+          tar -C release -czf foodtrip-release.tar.gz .
+
+      - name: Verify Artifact
+        run: |
+          tar -tzf foodtrip-release.tar.gz
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: foodtrip-api-ts-release
+          path: foodtrip-release.tar.gz
+          retention-days: 7
 
   deploy:
     name: Deploy to VPS
-    needs: [build, test]
+
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+
     runs-on: ubuntu-latest
+
+    needs:
+      - quality
+      - typecheck
+      - test
+      - build
+
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - uses: actions/download-artifact@v4
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
         with:
           name: foodtrip-api-ts-release
-          path: ./release
-      - name: Upload release artifact
-        uses: appleboy/scp-action@v0.1.5
+          path: .
+
+      - name: Upload Release Artifact
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_PRIVATE_KEY }}
           port: ${{ secrets.VPS_SSH_PORT || '22' }}
-          source: "./release/foodtrip-release.tar.gz"
-          target: /tmp/
-          # debug where folder is being uploaded
+          source: "foodtrip-release.tar.gz"
+          target: "/tmp"
 
-      - name: Upload deploy script
-        uses: appleboy/scp-action@v0.1.5
+      - name: Upload Deploy Script
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_PRIVATE_KEY }}
           port: ${{ secrets.VPS_SSH_PORT || '22' }}
           source: "scripts/deploy.sh"
-          target: /tmp/
-      - name: Run deploy on VPS
-        uses: appleboy/ssh-action@v0.1.7
+          target: "/tmp"
+
+      - name: Debug Uploaded Files
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || '22' }}
+          script: |
+            echo "=== Checking Uploaded Files ==="
+
+            find /tmp -name "foodtrip-release.tar.gz" || true
+            find /tmp -name "deploy.sh" || true
+
+      - name: Deploy Application
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
@@ -107,89 +392,59 @@ jobs:
           port: ${{ secrets.VPS_SSH_PORT || '22' }}
           script: |
             chmod +x /tmp/scripts/deploy.sh
-            bash /tmp/scripts/deploy.sh /tmp/release/foodtrip-release.tar.gz "${{ env.DEPLOY_PATH }}"
 
-  # docker:
-  #   name: Docker Build and Push
-  #   needs: [build, test]
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: read
-  #     packages: write
-  #   steps:
-  #     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-  #       with:
-  #         fetch-depth: 0 # Fetch all history for proper versioning
-  #     # Set up Docker Buildx
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
-  #     # Login to GitHub Container Registry
-  #     - name: Login to GitHub Container Registry
-  #       uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
-  #       with:
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-  #     # Generate Docker metadata (tags, labels)
-  #     - name: Docker metadata
-  #       id: meta
-  #       uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
-  #       with:
-  #         images: ghcr.io/${{ github.repository }}
-  #         tags: |
-  #           type=raw,value=${{ github.sha }}
-  #           type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
-  #           type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
-  #           type=semver,pattern={{major}}.{{minor}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
-  #           type=ref,event=branch
-  #           type=ref,event=pr
-  #           type=sha,format=long
-  #     # Build and push
-  #     - name: Build and push
-  #       uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
-  #       with:
-  #         context: .
-  #         push: ${{ github.event_name != 'pull_request' }}
-  #         tags: ${{ steps.meta.outputs.tags }}
-  #         labels: ${{ steps.meta.outputs.labels }}
-  #         cache-from: |
-  #           type=gha,scope=${{ github.ref_name }}-${{ github.job }}
-  #           type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
-  #         cache-to: |
-  #           type=gha,mode=max,scope=${{ github.ref_name }}-${{ github.job }}
-  #           type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
+            bash /tmp/scripts/deploy.sh \
+              /tmp/foodtrip-release.tar.gz \
+              "${{ env.DEPLOY_PATH }}"
+
+      - name: Health Check
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || '22' }}
+          script: |
+            sleep 10
+
+            curl -f http://localhost:3000/health
 
   summary:
     name: Workflow Summary
-    needs: [setup, quality, build, test]
+
+    if: always()
+
     runs-on: ubuntu-latest
-    if: always() # Run even if previous jobs fail
+
+    needs:
+      - quality
+      - typecheck
+      - test
+      - build
+      - deploy
+
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
-      - name: Generate CI Summary
+      - name: Generate Summary
         run: |
-          echo "# 📋 CI Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "# CI/CD Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          # Build info
+          echo "| Job | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          echo "| Quality | ${{ needs.quality.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Type Check | ${{ needs.typecheck.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy | ${{ needs.deploy.result }} |" >> $GITHUB_STEP_SUMMARY
+
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 🔨 Build Information" >> $GITHUB_STEP_SUMMARY
+
+          echo "## Build Info" >> $GITHUB_STEP_SUMMARY
+
           echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Repository** | ${{ github.repository }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Branch/Tag** | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Commit** | [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Triggered by** | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Workflow Run** | [View Details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |" >> $GITHUB_STEP_SUMMARY
-
-          # Docker image info (when applicable)
-          # if [[ "${{ needs.docker.result }}" == "success" && "${{ github.event_name }}" != "pull_request" ]]; then
-          #   echo "" >> $GITHUB_STEP_SUMMARY
-          #   echo "## 🐳 Docker Image" >> $GITHUB_STEP_SUMMARY
-          #   echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
-          #   echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
-          #   echo "| **Repository** | ghcr.io/${{ github.repository }} |" >> $GITHUB_STEP_SUMMARY
-          #   echo "| **Latest Tag** | ghcr.io/${{ github.repository }}:${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
-          #   echo "| **Package URL** | [View on GitHub](https://github.com/${{ github.repository }}/pkgs/container/$(echo '${{ github.repository }}' | cut -d'/' -f2)) |" >> $GITHUB_STEP_SUMMARY
-          # fi
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Repository | ${{ github.repository }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Event | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY

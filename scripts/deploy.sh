@@ -35,7 +35,7 @@ ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"
 cd "$CURRENT_LINK"
 
 # Run migrations
-pnpm exec prisma migrate deploy
+pnpm exec prisma generate
 
 # Reload or start PM2 app
 if ! pm2 reload ecosystem.config.cjs --env production; then
