@@ -29,6 +29,7 @@ if [ -d "$SHARED_DIR/public/uploads" ]; then
 fi
 
 cd "$RELEASE_DIR"
+pnpm approve-builds --filter prisma --filter @prisma/engines
 pnpm install --prod --frozen-lockfile
 
 ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"
