@@ -119,9 +119,11 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: production
+      name: env-foodtrip-ts
 
     steps:
+      # - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5ß
+
       - uses: actions/download-artifact@v4
         with:
           name: foodtrip-api-ts-release
