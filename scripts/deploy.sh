@@ -29,7 +29,7 @@ if [ -d "$SHARED_DIR/public/uploads" ]; then
 fi
 
 cd "$RELEASE_DIR"
-pnpm install --prod --frozen-lockfile
+pnpm install --frozen-lockfile
 
 ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"
 cd "$CURRENT_LINK"
