@@ -90,16 +90,16 @@ jobs:
           port: ${{ secrets.VPS_SSH_PORT || '22' }}
           source: "scripts/deploy.sh"
           target: /tmp/
-      # - name: Run deploy on VPS
-      #   uses: appleboy/ssh-action@v0.1.7
-      #   with:
-      #     host: ${{ secrets.VPS_HOST }}
-      #     username: ${{ secrets.VPS_USER }}
-      #     key: ${{ secrets.VPS_PRIVATE_KEY }}
-      #     port: ${{ secrets.VPS_SSH_PORT || '22' }}
-      #     script: |
-      #       chmod +x /tmp/scripts/deploy.sh
-      #       bash /tmp/scripts/deploy.sh /tmp/foodtrip-release.tar.gz "${{ env.DEPLOY_PATH }}"
+      - name: Run deploy on VPS
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || '22' }}
+          script: |
+            chmod +x /tmp/scripts/deploy.sh
+            bash /tmp/scripts/deploy.sh /tmp/release/foodtrip-release.tar.gz "${{ env.DEPLOY_PATH }}"
 
   # docker:
   #   name: Docker Build and Push
