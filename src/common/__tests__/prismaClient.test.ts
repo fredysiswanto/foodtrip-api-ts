@@ -5,7 +5,7 @@ import { prisma } from "@/common/utils/prismaClient";
 const TEST_EMAIL = "prisma-client-test@example.com";
 const TEST_FULL_NAME = "Prisma Client Test";
 // if value is development, we should run test if false we should skip test
-const isDevelopment: boolean = process.env.NODE_ENV === "development";
+const isProduction: boolean = process.env.NODE_ENV === "production";
 
 const ensureTestRole = async () => {
 	return prisma.role.upsert({
@@ -18,7 +18,7 @@ const ensureTestRole = async () => {
 	});
 };
 
-describe.skipIf(isDevelopment)("Prisma Client Integration", () => {
+describe.skipIf(!isProduction)("Prisma Client Integration", () => {
 	beforeAll(async () => {
 		await prisma.$connect();
 

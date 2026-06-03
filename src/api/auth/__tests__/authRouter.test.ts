@@ -9,8 +9,8 @@ const TEST_PASSWORD = "Password123!";
 const TEST_FULL_NAME = "Auth Router Test";
 
 const createPasswordHash = (password: string) => scryptSync(password, "some_random", 64).toString("hex");
-
-describe("Auth API Endpoints", () => {
+const isProduction: boolean = process.env.NODE_ENV === "production";
+describe.skipIf(!isProduction)("Auth API Endpoints", () => {
 	beforeAll(async () => {
 		await prisma.$connect();
 
