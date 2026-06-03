@@ -3,7 +3,6 @@ import express, { type Router } from "express";
 import { z } from "zod";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
-import { authMiddleware } from "@/common/middleware/authMiddleware";
 import { orderAccessMiddleware } from "@/common/middleware/restaurantAccessMiddleware";
 import { commonValidations } from "@/common/utils/commonValidation";
 import { validateRequest } from "@/common/utils/httpHandlers";

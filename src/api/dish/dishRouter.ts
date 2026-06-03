@@ -4,7 +4,6 @@ import { z } from "zod";
 import { dishController } from "@/api/dish/dishController";
 import { CreateDishSchema, DishSchema, UpdateDishSchema } from "@/api/dish/dishModel";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
 import { authMiddleware } from "@/common/middleware/authMiddleware";
 import { dishAccessMiddleware, restaurantAccessMiddleware } from "@/common/middleware/restaurantAccessMiddleware";
 import { commonValidations } from "@/common/utils/commonValidation";

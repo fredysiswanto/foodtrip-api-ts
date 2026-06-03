@@ -1,4 +1,4 @@
-import type { Request, RequestHandler } from "express";
+import type { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "@/api/auth/authService";
@@ -11,7 +11,7 @@ import type { RestaurantRole } from "@/generated/prisma/client";
 
 const extractTokenPayload = (token: string): JwtPayload => jwt.verify(token, env.JWT_SECRET) as JwtPayload;
 
-const requireAuthorization = (req: Request, res: any): JwtPayload | null => {
+const requireAuthorization = (req: Request, res: Response): JwtPayload | null => {
 	const authHeader = req.headers.authorization;
 	if (!authHeader?.startsWith("Bearer ")) {
 		const serviceResponse = ServiceResponse.failure(
