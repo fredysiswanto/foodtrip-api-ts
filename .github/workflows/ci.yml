@@ -176,19 +176,6 @@ jobs:
           source: "scripts/deploy.sh"
           target: "${{ env.DEPLOY_PATH }}"
 
-      - name: Debug Uploaded Files
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_PRIVATE_KEY }}
-          port: ${{ secrets.VPS_SSH_PORT || '22' }}
-          script: |
-            echo "=== Checking Uploaded Files ==="
-
-            find /tmp -name "foodtrip-release.tar.gz" || true
-            find /tmp -name "deploy.sh" || true
-
       - name: Deploy Application
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -197,11 +184,11 @@ jobs:
           key: ${{ secrets.VPS_PRIVATE_KEY }}
           port: ${{ secrets.VPS_SSH_PORT || '22' }}
           script: |
-            chmod +x /home/ubuntu/foodtrip-api-ts/scripts/deploy.sh
+            chmod +x ${{ env.DEPLOY_PATH }}/scripts/deploy.sh
 
-            bash /home/ubuntu/foodtrip-api-ts/scripts/deploy.sh \
+            bash ${{ env.DEPLOY_PATH }}/scripts/deploy.sh \
               /tmp/foodtrip-release.tar.gz \
-              /home/ubuntu/foodtrip-api-ts
+              "${{ env.DEPLOY_PATH }}"
 
       - name: Health Check
         uses: appleboy/ssh-action@v1.2.0
