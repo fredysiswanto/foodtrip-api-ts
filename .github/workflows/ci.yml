@@ -70,14 +70,23 @@ jobs:
         with:
           name: foodtrip-api-ts-release
           path: ./release
-      - name: Upload release artifact and deploy script
+      - name: Upload release artifact
         uses: appleboy/scp-action@v0.1.5
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_PRIVATE_KEY }}
           port: ${{ secrets.VPS_SSH_PORT || '22' }}
-          source: ./release/foodtrip-release.tar.gz,scripts/deploy.sh
+          source: "./release/foodtrip-release.tar.gz"
+          target: /tmp/
+      - name: Upload deploy script
+        uses: appleboy/scp-action@v0.1.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || '22' }}
+          source: "scripts/deploy.sh"
           target: /tmp/
       - name: Run deploy on VPS
         uses: appleboy/ssh-action@v0.1.7
