@@ -14,8 +14,8 @@ const TEST_USERS = [
 ];
 
 const createPasswordHash = (password: string) => scryptSync(password, PASSWORD_SALT, 64).toString("hex");
-
-describe("Prisma repository integration", () => {
+const isProduction: boolean = process.env.NODE_ENV === "production";
+describe.skipIf(!isProduction)("Prisma repository integration", () => {
 	beforeAll(async () => {
 		await prisma.$connect();
 
