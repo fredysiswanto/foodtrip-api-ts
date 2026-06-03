@@ -1,43 +1,48 @@
-#!/usr/bin/env bash
+# #!/usr/bin/env bash
 set -euo pipefail
 
-if [ $# -lt 1 ]; then
-  echo "Usage: $0 /path/to/artifact.tar.gz [deploy-base]"
-  exit 1
+export NVM_DIR="$HOME/.nvm"
+
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  . "$NVM_DIR/nvm.sh"
 fi
+
+export PATH="$HOME/.local/share/pnpm:$PATH"
 
 ARTIFACT_PATH="$1"
 DEPLOY_BASE="${2:-/home/ubuntu/foodtrip-api-ts}"
+
 RELEASE_DIR="$DEPLOY_BASE/releases/$(date +'%Y%m%d-%H%M%S')"
 CURRENT_LINK="$DEPLOY_BASE/current"
 SHARED_DIR="$DEPLOY_BASE/shared"
 
-mkdir -p "$RELEASE_DIR" "$SHARED_DIR" "$SHARED_DIR/logs" "$SHARED_DIR/public/uploads"
+mkdir -p "$RELEASE_DIR"
+mkdir -p "$SHARED_DIR/logs"
+mkdir -p "$SHARED_DIR/public/uploads"
 
 tar -xzf "$ARTIFACT_PATH" -C "$RELEASE_DIR"
 
-if [ -f "$SHARED_DIR/.env" ]; then
-  ln -sfn "$SHARED_DIR/.env" "$RELEASE_DIR/.env"
-else
-  echo "Warning: $SHARED_DIR/.env not found, continuing without shared .env file."
-fi
-
-if [ -d "$SHARED_DIR/public/uploads" ]; then
-  mkdir -p "$RELEASE_DIR/public"
-  rm -rf "$RELEASE_DIR/public/uploads"
-  ln -sfn "$SHARED_DIR/public/uploads" "$RELEASE_DIR/public/uploads"
-fi
+ln -sfn "$SHARED_DIR/.env" "$RELEASE_DIR/.env"
 
 cd "$RELEASE_DIR"
-pnpm install --frozen-lockfile
 
-ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"
-cd "$CURRENT_LINK"
+pnpm install --prod --frozen-lockfile
 
-# Run migrations
 pnpm exec prisma generate
 
-# Reload or start PM2 app
-if ! pm2 reload ecosystem.config.cjs --env production; then
+ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"
+
+cd "$CURRENT_LINK"
+
+if pm2 describe foodtrip-api-ts >/dev/null 2>&1; then
+  pm2 reload ecosystem.config.cjs --env production
+else
   pm2 start ecosystem.config.cjs --env production
 fi
+
+pm2 save
+
+# keep last 5 releases
+ls -dt "$DEPLOY_BASE"/releases/* \
+  | tail -n +6 \
+  | xargs rm -rf || true
