@@ -197,11 +197,11 @@ jobs:
           key: ${{ secrets.VPS_PRIVATE_KEY }}
           port: ${{ secrets.VPS_SSH_PORT || '22' }}
           script: |
-            chmod +x "${{ env.DEPLOY_PATH }}"/scripts/deploy.sh
+            chmod +x ${{ env.DEPLOY_PATH }}/scripts/deploy.sh
 
-            bash "${{ env.DEPLOY_PATH }}"/scripts/deploy.sh \
+            bash ${{ env.DEPLOY_PATH }}/scripts/deploy.sh \
               /tmp/foodtrip-release.tar.gz \
-              "${{ env.DEPLOY_PATH }}"
+              ${{ env.DEPLOY_PATH }}
 
       - name: Health Check
         uses: appleboy/ssh-action@v1.2.0
