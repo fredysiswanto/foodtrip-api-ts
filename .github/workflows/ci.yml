@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DEPLOY_PATH: /home/ubuntu/foodtrip-api-ts
+  DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
 
 jobs:
   quality:
