@@ -12,6 +12,14 @@ export const LoginRequestSchema = z.object({
 	}),
 });
 
+export const RestaurantLoginRequestSchema = z.object({
+	body: z.object({
+		email: z.string().email(),
+		password: z.string().min(8),
+		restaurantId: z.string().uuid().optional(),
+	}),
+});
+
 export const AuthTokenSchema = z.object({
 	accessToken: z.string().openapi({ description: "JWT access token" }),
 	tokenType: z.literal("Bearer"),
@@ -28,5 +36,6 @@ export const RegisterRequestSchema = z.object({
 });
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>["body"];
+export type RestaurantLoginRequest = z.infer<typeof RestaurantLoginRequestSchema>["body"];
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>["body"];
 export type AuthTokenResponse = z.infer<typeof AuthTokenSchema>;

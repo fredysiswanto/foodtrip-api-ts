@@ -7,10 +7,10 @@ import { app } from "@/server";
 const TEST_EMAIL = "auth-router-test@example.com";
 const TEST_PASSWORD = "Password123!";
 const TEST_FULL_NAME = "Auth Router Test";
-
-const createPasswordHash = (password: string) => scryptSync(password, "some_random", 64).toString("hex");
+const saltKey = process.env.PASSWORD_SALT || "default_jwt_secret";
+const createPasswordHash = (password: string) => scryptSync(password, saltKey, 64).toString("hex");
 const isProduction: boolean = process.env.NODE_ENV === "production";
-describe.skipIf(!isProduction)("Auth API Endpoints", () => {
+describe.skipIf(isProduction)("Auth API Endpoints", () => {
 	beforeAll(async () => {
 		await prisma.$connect();
 

@@ -11,6 +11,16 @@ export class AuthController {
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
+	public loginRestaurant: RequestHandler = async (req: Request, res: Response) => {
+		const { email, password, restaurantId } = req.body as {
+			email: string;
+			password: string;
+			restaurantId?: string;
+		};
+		const serviceResponse = await authService.loginRestaurant(email, password, restaurantId);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
+
 	public me: RequestHandler = async (req: Request, res: Response) => {
 		const authPayload = (req as Request & { user?: { userId: string } }).user;
 		if (!authPayload) {

@@ -11,6 +11,7 @@ import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
 import { env } from "@/common/utils/envConfig";
+import { restoRouter } from "./api/routes/restoRouter";
 
 const logger = pino({ name: "server start" });
 const app: Express = express();
@@ -31,6 +32,7 @@ app.use(requestLogger);
 // Routes
 app.use("/health", healthCheckRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/resto", restoRouter);
 app.use("/api", clientRouter);
 app.use("/api/admin", adminRouter);
 

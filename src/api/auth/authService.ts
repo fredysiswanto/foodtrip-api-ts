@@ -32,6 +32,12 @@ export class AuthService {
 		this.userRepository = userRepository;
 	}
 
+	private createToken(user: User): string {
+		return jwt.sign({ userId: user.id, email: user.email }, env.JWT_SECRET, {
+			expiresIn: env.JWT_EXPIRES_IN,
+		});
+	}
+
 	async login(email: string, password: string): Promise<ServiceResponse<AuthTokenResponse | null>> {
 		const authRecord = await this.authRepository.findByEmail(email);
 
@@ -53,11 +59,55 @@ export class AuthService {
 			);
 		}
 
-		const accessToken = jwt.sign({ userId: user.id, email: user.email }, env.JWT_SECRET, {
-			expiresIn: env.JWT_EXPIRES_IN,
-		});
+		const accessToken = this.createToken(user);
 
 		return ServiceResponse.success("Login successful.", {
+			accessToken,
+			tokenType: "Bearer",
+			expiresIn: env.JWT_EXPIRES_IN,
+		});
+	}
+
+	async loginRestaurant(
+		email: string,
+		password: string,
+		restaurantId?: string,
+	): Promise<ServiceResponse<AuthTokenResponse | null>> {
+		const authRecord = await this.authRepository.findByEmail(email);
+
+		if (!authRecord || !this.authRepository.verifyPassword(authRecord, password)) {
+			return ServiceResponse.failure<AuthTokenResponse | null>(
+				"Invalid email or password.",
+				null,
+				StatusCodes.UNAUTHORIZED,
+			);
+		}
+
+		const user = await this.userRepository.findByIdAsync(authRecord.id);
+
+		if (!user) {
+			return ServiceResponse.failure<AuthTokenResponse | null>(
+				"Authenticated user not found.",
+				null,
+				StatusCodes.UNAUTHORIZED,
+			);
+		}
+
+		const hasRestaurantAccess = restaurantId
+			? await this.userRepository.userHasRestaurantRole(user.id, restaurantId, ["OWNER", "ADMIN", "STAFF"])
+			: (await this.userRepository.userRestaurantIds(user.id, ["OWNER", "ADMIN", "STAFF"])).length > 0;
+
+		if (!hasRestaurantAccess) {
+			return ServiceResponse.failure<AuthTokenResponse | null>(
+				"Restaurant access denied.",
+				null,
+				StatusCodes.FORBIDDEN,
+			);
+		}
+
+		const accessToken = this.createToken(user);
+
+		return ServiceResponse.success("Restaurant login successful.", {
 			accessToken,
 			tokenType: "Bearer",
 			expiresIn: env.JWT_EXPIRES_IN,

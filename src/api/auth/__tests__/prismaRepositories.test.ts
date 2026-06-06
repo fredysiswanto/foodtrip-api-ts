@@ -6,7 +6,7 @@ import { prisma } from "@/common/utils/prismaClient";
 
 const authRepository = new AuthRepository();
 const userRepository = new UserRepository();
-const PASSWORD_SALT = "some_random";
+const PASSWORD_SALT = process.env.PASSWORD_SALT || "some_random";
 const TEST_PASSWORD = "Password123!";
 const TEST_USERS = [
 	{ email: "alice-test@example.com", fullName: "Alice Test" },
@@ -15,7 +15,7 @@ const TEST_USERS = [
 
 const createPasswordHash = (password: string) => scryptSync(password, PASSWORD_SALT, 64).toString("hex");
 const isProduction: boolean = process.env.NODE_ENV === "production";
-describe.skipIf(!isProduction)("Prisma repository integration", () => {
+describe.skipIf(isProduction)("Prisma repository integration", () => {
 	beforeAll(async () => {
 		await prisma.$connect();
 

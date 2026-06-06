@@ -7,11 +7,12 @@ import type { ServiceResponse } from "@/common/models/serviceResponse";
 import { prisma } from "@/common/utils/prismaClient";
 import { app } from "@/server";
 
-const TEST_EMAIL = "admin@example.com";
+const TEST_EMAIL = "admin@admin.com";
 const TEST_PASSWORD = "Password123!";
 const TEST_FULL_NAME = "User Router Test";
 
-const createPasswordHash = (password: string) => scryptSync(password, "some_random", 64).toString("hex");
+const PASSWORD_SALT = process.env.PASSWORD_SALT || "some_random";
+const createPasswordHash = (password: string) => scryptSync(password, PASSWORD_SALT, 64).toString("hex");
 
 const loginAsTestUser = async () => {
 	const response = await request(app).post("/api/auth/login").send({ email: TEST_EMAIL, password: TEST_PASSWORD });
@@ -19,7 +20,7 @@ const loginAsTestUser = async () => {
 	return response.body.data?.accessToken as string;
 };
 const isProduction: boolean = process.env.NODE_ENV === "production";
-describe.skipIf(!isProduction)("User API Endpoints", () => {
+describe.skipIf(isProduction)("User API Endpoints", () => {
 	let testUserId: string;
 
 	beforeAll(async () => {
