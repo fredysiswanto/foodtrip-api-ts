@@ -12,14 +12,15 @@ class RestaurantController {
 
 	public getMyRestaurants: RequestHandler = async (req: Request, res: Response) => {
 		const userId = (req as Request & { user?: { userId: string } }).user?.userId;
+		console.info(`User ${userId} is fetching their restaurants with query: ${JSON.stringify(req.query)}`);
 		const query = req.query;
 		const serviceResponse = await restaurantService.findAllForUser(userId, query);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
 	public getRestaurantById: RequestHandler = async (req: Request, res: Response) => {
-		const { id } = req.params;
-		const serviceResponse = await restaurantService.findById(id);
+		const { restaurantId } = req.params;
+		const serviceResponse = await restaurantService.findById(restaurantId);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
@@ -40,10 +41,19 @@ class RestaurantController {
 	};
 
 	public updateRestaurant: RequestHandler = async (req: Request, res: Response) => {
-		const { id } = req.params;
+		const { restaurantId } = req.params;
 		const updateData = req.body as Record<string, unknown>;
 
-		const serviceResponse = await restaurantService.update(id, updateData);
+		const serviceResponse = await restaurantService.update(restaurantId, updateData);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
+
+	public ownRestaurant: RequestHandler = async (req: Request, res: Response) => {
+		const query = req.query;
+
+		const userId = (req as Request & { user?: { userId: string } }).user?.userId;
+		console.info(`User ${userId} is fetching their restaurants with query: ${JSON.stringify(query)}`);
+		const serviceResponse = await restaurantService.findAllForUser(userId, query);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 }

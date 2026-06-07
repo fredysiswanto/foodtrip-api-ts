@@ -33,8 +33,8 @@ app.use(requestLogger);
 app.use("/health", healthCheckRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/resto", restoRouter);
-app.use("/api", clientRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api", clientRouter);
 
 app.use("/api/uploads/images", express.static("public/uploads"));
 
