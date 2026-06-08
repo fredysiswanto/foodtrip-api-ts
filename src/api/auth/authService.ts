@@ -16,6 +16,7 @@ export type AuthTokenResponse = {
 export type JwtPayload = {
 	userId: string;
 	email: string;
+	restaurantId?: string[];
 	iat?: number;
 	exp?: number;
 };
@@ -32,8 +33,17 @@ export class AuthService {
 		this.userRepository = userRepository;
 	}
 
-	private createToken(user: User): string {
-		return jwt.sign({ userId: user.id, email: user.email }, env.JWT_SECRET, {
+	private createToken(user: User, restaurantId?: string): string {
+		const payload: JwtPayload = {
+			userId: user.id,
+			email: user.email,
+		};
+
+		if (restaurantId) {
+			payload.restaurantId = [restaurantId];
+		}
+
+		return jwt.sign(payload, env.JWT_SECRET, {
 			expiresIn: env.JWT_EXPIRES_IN,
 		});
 	}
@@ -105,7 +115,7 @@ export class AuthService {
 			);
 		}
 
-		const accessToken = this.createToken(user);
+		const accessToken = this.createToken(user, restaurantId);
 
 		return ServiceResponse.success("Restaurant login successful.", {
 			accessToken,
