@@ -44,7 +44,7 @@ const createResourceAccessMiddleware = (
 
 		const restaurantId = await getRestaurantId(req);
 		if (!restaurantId) {
-			const serviceResponse = ServiceResponse.failure("Resource not found.", null, StatusCodes.NOT_FOUND);
+			const serviceResponse = ServiceResponse.failure("Data Resource not found.", null, StatusCodes.NOT_FOUND);
 			return res.status(serviceResponse.statusCode).send(serviceResponse);
 		}
 

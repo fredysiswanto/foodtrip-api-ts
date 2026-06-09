@@ -1,4 +1,4 @@
-import type { Request, RequestHandler, Response } from "express";
+import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "@/api/auth/authService";
@@ -9,7 +9,7 @@ import type { RestaurantRole } from "@/generated/prisma/client";
 
 const ALLOWED_RESTO_ROLES: RestaurantRole[] = ["OWNER", "ADMIN", "STAFF"];
 
-export const restoAuthMiddleware: RequestHandler = async (req: Request, res: Response, next) => {
+export const restoAuthMiddleware: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
 	const authHeader = req.headers.authorization;
 
 	if (!authHeader?.startsWith("Bearer ")) {

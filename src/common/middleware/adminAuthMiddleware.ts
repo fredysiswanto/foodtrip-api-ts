@@ -1,4 +1,4 @@
-import type { Request, RequestHandler, Response } from "express";
+import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "@/api/auth/authService";
@@ -8,7 +8,7 @@ import { env } from "@/common/utils/envConfig";
 
 const ALLOWED_ADMIN_ROLES = ["SUPER_ADMIN"];
 
-export const adminAuthMiddleware: RequestHandler = async (req: Request, res: Response, next) => {
+export const adminAuthMiddleware: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
 	const authHeader = req.headers.authorization;
 
 	if (!authHeader?.startsWith("Bearer ")) {

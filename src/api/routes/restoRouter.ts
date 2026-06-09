@@ -1,7 +1,11 @@
 import express, { type Router } from "express";
 import { z } from "zod";
 import { authMiddleware } from "@/common/middleware/authMiddleware";
-import { dishAccessMiddleware, restaurantAccessMiddleware } from "@/common/middleware/restaurantAccessMiddleware";
+import {
+	dishAccessMiddleware,
+	orderAccessMiddleware,
+	restaurantAccessMiddleware,
+} from "@/common/middleware/restaurantAccessMiddleware";
 import { restoAuthMiddleware } from "@/common/middleware/restoAuthMiddleware";
 import { commonValidations } from "@/common/utils/commonValidation";
 import { validateRequest } from "@/common/utils/httpHandlers";
@@ -9,7 +13,8 @@ import { authController } from "../auth/authController";
 import { RestaurantLoginRequestSchema } from "../auth/authModel";
 import { dishController } from "../dish/dishController";
 import { CreateDishSchema, UpdateDishSchema } from "../dish/dishModel";
-import { dishRouter } from "../dish/dishRouter";
+import { UpdateOrderPaymentStatusSchema, UpdateOrderStatusSchema } from "../order/order.dto";
+import { orderController } from "../order/orderController";
 import { restaurantController } from "../restaurant/restaurantController";
 import { UpdateRestaurantSchema } from "../restaurant/restaurantModel";
 
@@ -35,28 +40,49 @@ restoRouter.patch(
 
 restoRouter.get("/dishes", restoAuthMiddleware, dishController.getDishesByRestaurant);
 restoRouter.get(
-	"/:id",
+	"/dishes/:id",
 	dishAccessMiddleware(["OWNER", "ADMIN", "STAFF"]),
 	validateRequest(z.object({ params: z.object({ id: commonValidations.id }) })),
 	dishController.getDishById,
 );
-dishRouter.post(
-	"/",
+restoRouter.post(
+	"/dishes",
 	restaurantAccessMiddleware(["OWNER", "ADMIN"]),
 	validateRequest(z.object({ body: CreateDishSchema })),
 	dishController.createDish,
 );
 
-dishRouter.patch(
-	"/:id",
+restoRouter.patch(
+	"/dishes/:id",
 	dishAccessMiddleware(["OWNER", "ADMIN"]),
 	validateRequest(z.object({ params: z.object({ id: commonValidations.id }), body: UpdateDishSchema })),
 	dishController.updateDish,
 );
 
-dishRouter.delete(
-	"/:id",
+restoRouter.delete(
+	"/dishes/:id",
 	dishAccessMiddleware(["OWNER", "ADMIN"]),
 	validateRequest(z.object({ params: z.object({ id: commonValidations.id }) })),
 	dishController.deleteDish,
+);
+
+restoRouter.get("/orders", restoAuthMiddleware, orderController.getOrdersAdmin);
+restoRouter.get(
+	"/orders/:id",
+	orderAccessMiddleware(["OWNER", "ADMIN", "STAFF"]),
+	validateRequest(z.object({ params: z.object({ id: commonValidations.id }) })),
+	orderController.getOrderByIdAdmin,
+);
+
+restoRouter.patch(
+	"/orders/:id/status",
+	orderAccessMiddleware(["OWNER", "ADMIN", "STAFF"]),
+	validateRequest(z.object({ params: z.object({ id: commonValidations.id }), body: UpdateOrderStatusSchema })),
+	orderController.updateOrderStatus,
+);
+restoRouter.patch(
+	"/orders/:id/payment-status",
+	orderAccessMiddleware(["OWNER", "ADMIN", "STAFF"]),
+	validateRequest(z.object({ params: z.object({ id: commonValidations.id }), body: UpdateOrderPaymentStatusSchema })),
+	orderController.updateOrderPaymentStatus,
 );
