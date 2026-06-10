@@ -4,7 +4,9 @@ import type { Prisma, RestaurantRole } from "@/generated/prisma/client";
 
 type PrismaUser = Prisma.UserModel;
 
-const mapPrismaUserToUser = (user: PrismaUser & { role: { name: string } }): User => ({
+const mapPrismaUserToUser = (
+	user: PrismaUser & { role: { name: string }; restaurants?: { restaurantId: string; restaurantRole: string }[] },
+): User & { restaurants?: { restaurantId: string; restaurantRole: string }[] } => ({
 	id: user.id,
 	roleId: user.roleId,
 	roleName: user.role.name,
@@ -16,6 +18,7 @@ const mapPrismaUserToUser = (user: PrismaUser & { role: { name: string } }): Use
 	createdAt: user.createdAt,
 	updatedAt: user.updatedAt,
 	deletedAt: user.deletedAt ?? null,
+	restaurants: user.restaurants ?? [],
 });
 
 export class UserRepository {
@@ -126,7 +129,10 @@ export class UserRepository {
 	async findByIdAsync(id: string): Promise<User | null> {
 		const user = await prisma.user.findUnique({
 			where: { id },
-			include: { role: { select: { name: true } } },
+			include: {
+				role: { select: { name: true } },
+				restaurants: { select: { restaurantId: true, restaurantRole: true } },
+			},
 		});
 
 		return user ? mapPrismaUserToUser(user) : null;

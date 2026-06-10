@@ -31,8 +31,8 @@ app.use(requestLogger);
 // Routes
 app.use("/health", healthCheckRouter);
 app.use("/api/auth", authRouter);
-app.use("/api", clientRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api", clientRouter);
 
 app.use("/api/uploads/images", express.static("public/uploads"));
 

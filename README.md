@@ -157,3 +157,12 @@ We'd love to hear your feedback and suggestions for further improvements. Feel f
 
 note : 
 i'm using this template for my project https://github.com/edwinhern/express-typescript
+
+
+### User Demo
+| Role | Username |Pass |
+|---|---|---|
+| Customer | customer@example.com | Password123! |
+| Staff | staff@example.com | Password123! |
+| Owner | owner@example.com | Password123! |
+| Admin | admin@example.com | Password123! |

@@ -4,7 +4,7 @@ import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "../src/generated/prisma/client";
 
 const HASH_BYTE_SIZE = 64;
-const PASSWORD_SALT = "some_random";
+const PASSWORD_SALT = process.env.PASSWORD_SALT || "default_salt_value";
 const DEFAULT_PASSWORD = "Password123!";
 
 const createPasswordHash = (password: string) => scryptSync(password, PASSWORD_SALT, HASH_BYTE_SIZE).toString("hex");
@@ -26,6 +26,15 @@ async function main() {
 		create: {
 			name: "SUPER_ADMIN",
 			description: "System super administrator",
+		},
+	});
+
+	const adminRole = await prisma.role.upsert({
+		where: { name: "ADMIN" },
+		update: {},
+		create: {
+			name: "ADMIN",
+			description: "Administrator role with management permissions",
 		},
 	});
 

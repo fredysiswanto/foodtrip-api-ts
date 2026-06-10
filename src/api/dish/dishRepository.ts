@@ -38,6 +38,42 @@ export class DishRepository {
 		return createPaginationResponse(dishes, totalItems, page, limit);
 	}
 
+	async findAllByRestaurantIds(
+		restaurantIds: string[],
+		query: GetDishesQuery,
+	): Promise<{
+		data: Pick<Dish, "id" | "name" | "description" | "price" | "isAvailable" | "createdAt">[];
+		meta: PaginationMeta;
+	}> {
+		const { page, limit, skip } = getPagination(query);
+		const where = {
+			restaurantId: {
+				in: restaurantIds,
+			},
+			...buildSearch(query.search, ["name"]),
+		};
+		const orderBy = buildOrderBy(query.sortBy, query.sortOrder, ["name", "price", "createdAt"]);
+		const [dishes, totalItems] = await Promise.all([
+			prisma.dish.findMany({
+				select: {
+					id: true,
+					name: true,
+					description: true,
+					price: true,
+					isAvailable: true,
+					createdAt: true,
+				},
+				where,
+				skip,
+				take: limit,
+				orderBy,
+			}),
+			prisma.dish.count({ where }),
+		]);
+
+		return createPaginationResponse(dishes, totalItems, page, limit);
+	}
+
 	async findById(id: string): Promise<Dish | null> {
 		return prisma.dish.findUnique({
 			where: { id },

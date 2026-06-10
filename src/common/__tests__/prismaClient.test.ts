@@ -18,7 +18,7 @@ const ensureTestRole = async () => {
 	});
 };
 
-describe.skipIf(!isProduction)("Prisma Client Integration", () => {
+describe.skipIf(isProduction)("Prisma Client Integration", () => {
 	beforeAll(async () => {
 		await prisma.$connect();
 

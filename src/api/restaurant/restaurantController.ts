@@ -6,6 +6,8 @@ import { restaurantService } from "./restaurantService";
 class RestaurantController {
 	public getRestaurants: RequestHandler = async (_req: Request, res: Response) => {
 		const query = _req.query;
+		const dataUser = _req.user;
+		console.log("User data in controller:", dataUser);
 		const serviceResponse = await restaurantService.findAll(query);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
@@ -18,8 +20,8 @@ class RestaurantController {
 	};
 
 	public getRestaurantById: RequestHandler = async (req: Request, res: Response) => {
-		const { id } = req.params;
-		const serviceResponse = await restaurantService.findById(id);
+		const { restaurantId } = req.params;
+		const serviceResponse = await restaurantService.findById(restaurantId);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
@@ -40,10 +42,17 @@ class RestaurantController {
 	};
 
 	public updateRestaurant: RequestHandler = async (req: Request, res: Response) => {
-		const { id } = req.params;
+		const { restaurantId } = req.params;
 		const updateData = req.body as Record<string, unknown>;
 
-		const serviceResponse = await restaurantService.update(id, updateData);
+		const serviceResponse = await restaurantService.update(restaurantId, updateData);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
+
+	public ownRestaurant: RequestHandler = async (req: Request, res: Response) => {
+		const query = req.query;
+		const userId = (req as Request & { user?: { userId: string } }).user?.userId;
+		const serviceResponse = await restaurantService.findAllForUser(userId, query);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 }

@@ -51,6 +51,29 @@ export class DishService {
 		}
 	}
 
+	public async findAllByRestaurants(
+		restaurantIds: string[],
+		query: GetDishesQuery,
+	): Promise<
+		ServiceResponse<Pick<Dish, "id" | "name" | "description" | "price" | "isAvailable" | "createdAt">[] | null>
+	> {
+		if (!restaurantIds || restaurantIds.length === 0) {
+			return ServiceResponse.failure("Restaurant IDDs are required.", null, StatusCodes.BAD_REQUEST);
+		}
+
+		try {
+			const { data, meta } = await this.repository.findAllByRestaurantIds(restaurantIds, query);
+
+			return ServiceResponse.paginatedSuccess("Dishes found for the restaurant.", data, meta);
+		} catch (error) {
+			return ServiceResponse.failure(
+				`Unable to retrieve dishes for the restaurant. ${error instanceof Error ? error.message : "Unknown error"}`,
+				null,
+				StatusCodes.NOT_FOUND,
+			);
+		}
+	}
+
 	async findById(id: string): Promise<ServiceResponse<Dish | null>> {
 		try {
 			const dish = await this.repository.findById(id);

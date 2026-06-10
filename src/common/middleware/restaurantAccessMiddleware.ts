@@ -1,17 +1,18 @@
 import type { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import jwt from "jsonwebtoken";
-import type { JwtPayload } from "@/api/auth/authService";
 import { DishRepository } from "@/api/dish/dishRepository";
 import { OrderRepository } from "@/api/order/orderRepository";
 import { UserRepository } from "@/api/user/userRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
-import { env } from "@/common/utils/envConfig";
+import { JwtHelper, type JwtPayload } from "@/common/utils/jwtHelper";
 import type { RestaurantRole } from "@/generated/prisma/client";
 
-const extractTokenPayload = (token: string): JwtPayload => jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+const jwtHelper = new JwtHelper();
+const extractTokenPayload = async (token: string): Promise<JwtPayload | null> => {
+	return await jwtHelper.decodeToken(token);
+};
 
-const requireAuthorization = (req: Request, res: Response): JwtPayload | null => {
+const requireAuthorization = async (req: Request, res: Response): Promise<JwtPayload | null> => {
 	const authHeader = req.headers.authorization;
 	if (!authHeader?.startsWith("Bearer ")) {
 		const serviceResponse = ServiceResponse.failure(
@@ -24,7 +25,7 @@ const requireAuthorization = (req: Request, res: Response): JwtPayload | null =>
 	}
 
 	try {
-		return extractTokenPayload(authHeader.split(" ")[1]);
+		return await extractTokenPayload(authHeader.split(" ")[1]);
 	} catch {
 		const serviceResponse = ServiceResponse.failure("Invalid or expired token.", null, StatusCodes.UNAUTHORIZED);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
@@ -37,14 +38,14 @@ const createResourceAccessMiddleware = (
 	allowedRoles: Array<RestaurantRole> = ["OWNER", "ADMIN", "STAFF"],
 ): RequestHandler => {
 	return async (req, res, next) => {
-		const payload = requireAuthorization(req, res);
+		const payload = await requireAuthorization(req, res);
 		if (!payload) {
 			return;
 		}
 
 		const restaurantId = await getRestaurantId(req);
 		if (!restaurantId) {
-			const serviceResponse = ServiceResponse.failure("Resource not found.", null, StatusCodes.NOT_FOUND);
+			const serviceResponse = ServiceResponse.failure("Data Resource not found.", null, StatusCodes.NOT_FOUND);
 			return res.status(serviceResponse.statusCode).send(serviceResponse);
 		}
 
@@ -57,7 +58,7 @@ const createResourceAccessMiddleware = (
 			return res.status(serviceResponse.statusCode).send(serviceResponse);
 		}
 
-		(req as Request & { user?: JwtPayload }).user = payload;
+		// (req as Request & { user?: JwtPayload }).user = payload;
 		next();
 	};
 };
