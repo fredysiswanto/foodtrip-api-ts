@@ -6,8 +6,6 @@ import { restaurantService } from "./restaurantService";
 class RestaurantController {
 	public getRestaurants: RequestHandler = async (_req: Request, res: Response) => {
 		const query = _req.query;
-		const dataUser = _req.user;
-		console.log("User data in controller:", dataUser);
 		const serviceResponse = await restaurantService.findAll(query);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
