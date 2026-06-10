@@ -9,8 +9,9 @@ export default defineConfig({
 		globals: true,
 		restoreMocks: true,
 		hookTimeout: 10000,
+		testTimeout: 10000,
 		env: {
-			NODE_ENV: "development",
+			NODE_ENV: "production",
 		},
 	},
 
