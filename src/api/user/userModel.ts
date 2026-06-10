@@ -17,6 +17,14 @@ export const UserSchema = z.object({
 	createdAt: z.date(),
 	updatedAt: z.date(),
 	deletedAt: z.date().nullable(),
+	restaurants: z
+		.array(
+			z.object({
+				restaurantId: z.string().uuid(),
+				restaurantRole: z.string(),
+			}),
+		)
+		.optional(),
 });
 
 // Input Validation for 'GET users/:id' endpoint

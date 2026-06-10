@@ -4,6 +4,7 @@ import type { User } from "@/api/user/userModel";
 import { UserRepository } from "@/api/user/userRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { env } from "@/common/utils/envConfig";
+import { rolePermissions } from "@/common/utils/permissions";
 import type { RegisterRequest } from "./authModel";
 import { AuthRepository } from "./authRepository";
 
@@ -16,7 +17,12 @@ export type AuthTokenResponse = {
 export type JwtPayload = {
 	userId: string;
 	email: string;
-	restaurantId?: string[];
+	role: string; // RoleName
+	permissions: string[];
+	restaurants?: {
+		restaurantId: string;
+		restaurantRole: string;
+	}[];
 	iat?: number;
 	exp?: number;
 };
@@ -37,10 +43,18 @@ export class AuthService {
 		const payload: JwtPayload = {
 			userId: user.id,
 			email: user.email,
+			role: user.roleName,
+			permissions: rolePermissions[user.roleName as keyof typeof rolePermissions] || [],
+			restaurants: user.restaurants,
 		};
 
 		if (restaurantId) {
-			payload.restaurantId = [restaurantId];
+			payload.restaurants = [
+				{
+					restaurantId: restaurantId,
+					restaurantRole: user.roleName,
+				},
+			];
 		}
 
 		return jwt.sign(payload, env.JWT_SECRET, {

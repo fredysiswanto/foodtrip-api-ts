@@ -57,7 +57,7 @@ const createResourceAccessMiddleware = (
 			return res.status(serviceResponse.statusCode).send(serviceResponse);
 		}
 
-		(req as Request & { user?: JwtPayload }).user = payload;
+		// (req as Request & { user?: JwtPayload }).user = payload;
 		next();
 	};
 };
