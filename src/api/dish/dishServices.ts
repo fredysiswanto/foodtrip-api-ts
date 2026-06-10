@@ -14,7 +14,7 @@ export interface GetDishesQuery {
 }
 
 export class DishService {
-	private repository = new DishRepository();
+	constructor(private repository: DishRepository = new DishRepository()) {}
 
 	private async validateRelations(data: Partial<CreateDishInput>): Promise<string | null> {
 		if (data.restaurantId && !(await this.repository.restaurantExists(data.restaurantId))) {

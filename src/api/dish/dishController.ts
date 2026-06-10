@@ -3,18 +3,20 @@ import { StatusCodes } from "http-status-codes";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { validateData } from "@/common/utils/commonValidation";
 import { type CreateDishInput, CreateDishSchema, type UpdateDishInput } from "./dishModel";
-import { dishService } from "./dishServices";
+import { type DishService, dishService } from "./dishServices";
 
-class DishController {
+export class DishController {
+	constructor(private readonly dishService: DishService) {}
+
 	public getDishes: RequestHandler = async (_req: Request, res: Response) => {
 		const query = _req.query;
-		const serviceResponse = await dishService.findAll(query);
+		const serviceResponse = await this.dishService.findAll(query);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
 	public getDishById: RequestHandler = async (_req: Request, res: Response) => {
 		const { id } = _req.params;
-		const serviceResponse = await dishService.findById(id);
+		const serviceResponse = await this.dishService.findById(id);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
@@ -23,7 +25,7 @@ class DishController {
 		const isValid = validateData(CreateDishSchema, data);
 
 		if (isValid) {
-			const serviceResponse = await dishService.create(isValid);
+			const serviceResponse = await this.dishService.create(isValid);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
 		} else {
 			res.status(400).send({
@@ -39,7 +41,7 @@ class DishController {
 		const data = req.body as UpdateDishInput;
 		const isValid = validateData(CreateDishSchema.partial(), data);
 		if (isValid) {
-			const serviceResponse = await dishService.update(id, data);
+			const serviceResponse = await this.dishService.update(id, data);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
 		} else {
 			res.status(400).send({
@@ -52,7 +54,7 @@ class DishController {
 
 	public deleteDish: RequestHandler = async (req: Request, res: Response) => {
 		const { id } = req.params;
-		const serviceResponse = await dishService.delete(id);
+		const serviceResponse = await this.dishService.delete(id);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 
@@ -64,9 +66,9 @@ class DishController {
 			return res.status(serviceResponse.statusCode).send(serviceResponse);
 		}
 
-		const serviceResponse = await dishService.findAllByRestaurants(restaurantId, req.query);
+		const serviceResponse = await this.dishService.findAllByRestaurants(restaurantId, req.query);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 }
 
-export const dishController = new DishController();
+export const dishController = new DishController(dishService);
