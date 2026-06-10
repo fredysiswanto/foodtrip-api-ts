@@ -4,13 +4,13 @@ import type { RoleName } from "@/generated/prisma/client";
 export const PERMISSIONS = {
 	MANAGE_USERS: "manage_users",
 	MANAGE_RESTAURANTS: "manage_restaurants",
-	VIEW_ORDERS: "view_orders",
 	MANAGE_ORDERS: "manage_orders",
 	MANAGE_MENU: "manage_menu",
-	VIEW_DELIVERIES: "view_deliveries",
 	MANAGE_DELIVERIES: "manage_deliveries",
-	VIEW_AUDIT_LOGS: "view_audit_logs",
 	MANAGE_SYSTEM: "manage_system",
+	VIEW_ORDERS: "view_orders",
+	VIEW_DELIVERIES: "view_deliveries",
+	VIEW_AUDIT_LOGS: "view_audit_logs",
 } as const;
 
 // Mapping global role ke permission array

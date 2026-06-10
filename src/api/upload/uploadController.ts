@@ -1,7 +1,7 @@
 import type { Request, RequestHandler, Response } from "express";
 import { validateData } from "@/common/utils/commonValidation";
+import type { JwtPayload } from "@/common/utils/jwtHelper";
 import type { UploadType } from "@/generated/prisma/client";
-import type { JwtPayload } from "../auth/authService";
 import { UploadRequestBodySchema } from "./uploadModel";
 import { type GetUploadsQuery, UploadService } from "./uploadServices";
 

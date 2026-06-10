@@ -1,14 +1,13 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import jwt from "jsonwebtoken";
-import type { JwtPayload } from "@/api/auth/authService";
 import { ServiceResponse } from "@/common/models/serviceResponse";
-import { env } from "@/common/utils/envConfig";
+import { JwtHelper } from "@/common/utils/jwtHelper";
 import type { RestaurantRole, RoleName } from "@/generated/prisma/browser";
 
 const ALLOWED_ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN"] as RoleName[];
 
 export const adminAuthMiddleware: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+	const jwtHelper = new JwtHelper();
 	const authHeader = req.headers.authorization;
 
 	if (!authHeader?.startsWith("Bearer ")) {
@@ -23,7 +22,7 @@ export const adminAuthMiddleware: RequestHandler = async (req: Request, res: Res
 	const token = authHeader.split(" ")[1];
 
 	try {
-		const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+		const payload = await jwtHelper.decodeToken(token);
 		// const userRepository = new UserRepository();
 		// const user = await userRepository.findByIdAsync(payload.userId);
 

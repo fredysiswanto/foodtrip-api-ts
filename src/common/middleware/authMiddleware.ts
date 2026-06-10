@@ -1,12 +1,11 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import jwt from "jsonwebtoken";
-import type { JwtPayload } from "@/api/auth/authService";
 import { ServiceResponse } from "@/common/models/serviceResponse";
-import { env } from "@/common/utils/envConfig";
+import { JwtHelper, type JwtPayload } from "@/common/utils/jwtHelper";
 import type { RestaurantRole, RoleName } from "@/generated/prisma/browser";
 
-export const authMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+	const jwtHelper = new JwtHelper();
 	const authHeader = req.headers.authorization;
 
 	if (!authHeader?.startsWith("Bearer ")) {
@@ -21,7 +20,7 @@ export const authMiddleware: RequestHandler = (req: Request, res: Response, next
 	const token = authHeader.split(" ")[1];
 
 	try {
-		const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+		const payload = (await jwtHelper.decodeToken(token)) as JwtPayload;
 		req.user = {
 			userId: payload.userId,
 			email: payload.email,
@@ -67,7 +66,7 @@ export const authorizePermissions = (...requiredPermissions: string[]) => {
 			const serviceResponse = ServiceResponse.failure("Access denied: unauthenticated", null, StatusCodes.FORBIDDEN);
 			return res.status(serviceResponse.statusCode).send(serviceResponse);
 		}
-		const hasAllPermissions = requiredPermissions.every((perm) => user.permissions.includes(perm));
+		const hasAllPermissions = requiredPermissions.every((permission) => user.permissions.includes(permission));
 		if (!hasAllPermissions) {
 			const serviceResponse = ServiceResponse.failure(
 				"Access denied: insufficient permissions",

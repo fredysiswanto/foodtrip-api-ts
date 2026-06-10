@@ -6,7 +6,6 @@ import {
 	orderAccessMiddleware,
 	restaurantAccessMiddleware,
 } from "@/common/middleware/restaurantAccessMiddleware";
-import { restoAuthMiddleware } from "@/common/middleware/restoAuthMiddleware";
 import { commonValidations } from "@/common/utils/commonValidation";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { authController } from "../auth/authController";
@@ -38,7 +37,7 @@ restoRouter.patch(
 	restaurantController.updateRestaurant,
 );
 
-restoRouter.get("/dishes", restoAuthMiddleware, dishController.getDishesByRestaurant);
+restoRouter.get("/dishes", authMiddleware, dishController.getDishesByRestaurant);
 restoRouter.get(
 	"/dishes/:id",
 	dishAccessMiddleware(["OWNER", "ADMIN", "STAFF"]),
@@ -66,7 +65,7 @@ restoRouter.delete(
 	dishController.deleteDish,
 );
 
-restoRouter.get("/orders", restoAuthMiddleware, orderController.getOrdersAdmin);
+restoRouter.get("/orders", authMiddleware, orderController.getOrdersAdmin);
 restoRouter.get(
 	"/orders/:id",
 	orderAccessMiddleware(["OWNER", "ADMIN", "STAFF"]),

@@ -1,9 +1,9 @@
 import { StatusCodes } from "http-status-codes";
-import jwt from "jsonwebtoken";
 import type { User } from "@/api/user/userModel";
 import { UserRepository } from "@/api/user/userRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { env } from "@/common/utils/envConfig";
+import { JwtHelper, type JwtPayload } from "@/common/utils/jwtHelper";
 import { rolePermissions } from "@/common/utils/permissions";
 import type { RegisterRequest } from "./authModel";
 import { AuthRepository } from "./authRepository";
@@ -14,32 +14,21 @@ export type AuthTokenResponse = {
 	expiresIn: string;
 };
 
-export type JwtPayload = {
-	userId: string;
-	email: string;
-	role: string; // RoleName
-	permissions: string[];
-	restaurants?: {
-		restaurantId: string;
-		restaurantRole: string;
-	}[];
-	iat?: number;
-	exp?: number;
-};
-
 export class AuthService {
 	private authRepository: AuthRepository;
 	private userRepository: UserRepository;
-
+	private jwtHelper: JwtHelper;
 	constructor(
 		authRepository: AuthRepository = new AuthRepository(),
 		userRepository: UserRepository = new UserRepository(),
+		jwtHelper: JwtHelper = new JwtHelper(),
 	) {
 		this.authRepository = authRepository;
 		this.userRepository = userRepository;
+		this.jwtHelper = jwtHelper;
 	}
 
-	private createToken(user: User, restaurantId?: string): string {
+	private async createToken(user: User, restaurantId?: string): Promise<string> {
 		const payload: JwtPayload = {
 			userId: user.id,
 			email: user.email,
@@ -57,15 +46,23 @@ export class AuthService {
 			];
 		}
 
-		return jwt.sign(payload, env.JWT_SECRET, {
-			expiresIn: env.JWT_EXPIRES_IN,
-		});
+		const token = await this.jwtHelper.generateToken(payload, env.JWT_EXPIRES_IN);
+		return token;
+	}
+
+	async verifyToken(token: string): Promise<ServiceResponse<JwtPayload | null>> {
+		const verificationResult = await this.jwtHelper.decodeToken(token);
+		if (!verificationResult) {
+			return ServiceResponse.failure<JwtPayload | null>("Invalid or expired token.", null, StatusCodes.UNAUTHORIZED);
+		}
+		return ServiceResponse.success("Token valid.", verificationResult, StatusCodes.OK);
 	}
 
 	async login(email: string, password: string): Promise<ServiceResponse<AuthTokenResponse | null>> {
 		const authRecord = await this.authRepository.findByEmail(email);
+		const passwordValid = authRecord ? this.authRepository.verifyPassword(authRecord, password) : false;
 
-		if (!authRecord || !this.authRepository.verifyPassword(authRecord, password)) {
+		if (!authRecord || !passwordValid) {
 			return ServiceResponse.failure<AuthTokenResponse | null>(
 				"Invalid email or password.",
 				null,
@@ -83,7 +80,7 @@ export class AuthService {
 			);
 		}
 
-		const accessToken = this.createToken(user);
+		const accessToken = await this.createToken(user);
 
 		return ServiceResponse.success("Login successful.", {
 			accessToken,
@@ -129,22 +126,13 @@ export class AuthService {
 			);
 		}
 
-		const accessToken = this.createToken(user, restaurantId);
+		const accessToken = await this.createToken(user, restaurantId);
 
 		return ServiceResponse.success("Restaurant login successful.", {
 			accessToken,
 			tokenType: "Bearer",
 			expiresIn: env.JWT_EXPIRES_IN,
 		});
-	}
-
-	verifyToken(token: string): ServiceResponse<JwtPayload | null> {
-		try {
-			const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
-			return ServiceResponse.success("Token valid.", payload, StatusCodes.OK);
-		} catch {
-			return ServiceResponse.failure<JwtPayload | null>("Invalid or expired token.", null, StatusCodes.UNAUTHORIZED);
-		}
 	}
 
 	async register(payload: RegisterRequest): Promise<ServiceResponse<User | null>> {
