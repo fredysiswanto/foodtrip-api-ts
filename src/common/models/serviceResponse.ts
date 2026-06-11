@@ -38,9 +38,9 @@ export class ServiceResponse<T = null> {
 
 	static paginatedSuccess<T>(
 		message: string,
-		statusCode: number = StatusCodes.OK,
 		responseObject: T,
 		meta: PaginationMeta,
+		statusCode: number = StatusCodes.OK,
 	) {
 		const serviceResponse = new ServiceResponse(true, message, responseObject, statusCode);
 		serviceResponse.meta = meta;
