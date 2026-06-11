@@ -44,5 +44,5 @@ pm2 save
 
 # keep last 5 releases
 ls -dt "$DEPLOY_BASE"/releases/* \
-  | tail -n +2 \
+  | tail -n +3 \
   | xargs rm -rf || true
