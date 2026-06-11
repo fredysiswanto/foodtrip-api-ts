@@ -155,6 +155,7 @@ dishRegistry.registerPath({
 	method: "post",
 	path: adminBasePath,
 	tags: ["Dish"],
+	summary: "Create new dish",
 	request: {
 		body: {
 			description: "Create dish payload",
@@ -173,6 +174,7 @@ dishRegistry.registerPath({
 	method: "patch",
 	path: `${adminBasePath}/{id}`,
 	tags: ["Dish"],
+	summary: "Update dish",
 	request: {
 		params: z.object({ id: commonValidations.id }),
 		body: {
@@ -192,6 +194,7 @@ dishRegistry.registerPath({
 	method: "delete",
 	path: `${adminBasePath}/{id}`,
 	tags: ["Dish"],
+	summary: "Delete dish",
 	request: { params: z.object({ id: commonValidations.id }) },
 	responses: createApiResponse(z.null(), "Dish deleted successfully"),
 });

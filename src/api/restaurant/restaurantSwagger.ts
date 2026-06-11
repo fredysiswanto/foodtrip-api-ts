@@ -87,6 +87,7 @@ restaurantRegistry.registerPath({
 	method: "get",
 	path: basePath,
 	tags: ["Restaurant"],
+	summary: "Get all restaurants",
 	responses: createApiResponse(z.array(RestaurantSchema), "Restaurants retrieved successfully"),
 });
 
@@ -95,6 +96,7 @@ restaurantRegistry.registerPath({
 	method: "get",
 	path: `${basePath}/{restaurantId}`,
 	tags: ["Restaurant"],
+	summary: "Get restaurant by ID",
 	request: { params: z.object({ restaurantId: commonValidations.id }) },
 	responses: createApiResponse(RestaurantSchema, "Restaurant retrieved successfully"),
 });
@@ -104,6 +106,7 @@ restaurantRegistry.registerPath({
 	method: "post",
 	path: basePath,
 	tags: ["Restaurant"],
+	summary: "Create new restaurant",
 	request: {
 		body: {
 			description: "Create restaurant payload",
@@ -122,6 +125,7 @@ restaurantRegistry.registerPath({
 	method: "patch",
 	path: `${basePath}/{restaurantId}`,
 	tags: ["Restaurant"],
+	summary: "Update restaurant",
 	request: {
 		params: z.object({ restaurantId: commonValidations.id }),
 		body: {
