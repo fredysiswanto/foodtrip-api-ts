@@ -11,7 +11,7 @@ export interface GetRestaurantsQuery {
 	page?: string;
 	limit?: string;
 	search?: string;
-	sortBy?: "name" | "price" | "createdAt";
+	sortBy?: "name" | "status" | "createdAt";
 	sortOrder?: "asc" | "desc";
 }
 

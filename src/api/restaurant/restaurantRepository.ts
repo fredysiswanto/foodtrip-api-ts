@@ -47,7 +47,7 @@ export class RestaurantRepository {
 			return createPaginationResponse([], 0, page, limit);
 		}
 
-		const orderBy = buildOrderBy(query.sortBy, query.sortOrder, ["name", "createdAt"]);
+		const orderBy = buildOrderBy(query.sortBy, query.sortOrder, ["name", "createdAt", "status"]);
 		const [restaurants, totalItems] = await Promise.all([
 			prisma.restaurant.findMany({
 				select: {

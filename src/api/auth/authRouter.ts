@@ -43,47 +43,48 @@ authRegistry.registerPath({
 			},
 		},
 	},
-	responses: {
-		[StatusCodes.CREATED]: {
-			description: "User registered successfully",
-			content: {
-				"application/json": {
-					schema: createApiResponse(UserSchema, "User registered successfully", StatusCodes.CREATED)[
-						StatusCodes.CREATED
-					].content["application/json"].schema,
-				},
-			},
-		},
-		[StatusCodes.BAD_REQUEST]: {
-			description: "Invalid input - missing or invalid email, password (min 8 chars), full name, or phone number",
-			content: {
-				"application/json": {
-					schema: createApiResponse(UserSchema, "Invalid input", StatusCodes.BAD_REQUEST)[StatusCodes.BAD_REQUEST]
-						.content["application/json"].schema,
-				},
-			},
-		},
-		[StatusCodes.CONFLICT]: {
-			description: "Conflict - email or phone number already registered",
-			content: {
-				"application/json": {
-					schema: createApiResponse(UserSchema, "Email or phone already exists", StatusCodes.CONFLICT)[
-						StatusCodes.CONFLICT
-					].content["application/json"].schema,
-				},
-			},
-		},
-		[StatusCodes.INTERNAL_SERVER_ERROR]: {
-			description: "Server error - failed to create user account",
-			content: {
-				"application/json": {
-					schema: createApiResponse(UserSchema, "Server error", StatusCodes.INTERNAL_SERVER_ERROR)[
-						StatusCodes.INTERNAL_SERVER_ERROR
-					].content["application/json"].schema,
-				},
-			},
-		},
-	},
+	responses: createApiResponse(UserSchema, "User registered successfully", StatusCodes.CREATED),
+	// responses: {
+	// 	[StatusCodes.CREATED]: {
+	// 		description: "User registered successfully",
+	// 		content: {
+	// 			"application/json": {
+	// 				schema: createApiResponse(UserSchema, "User registered successfully", StatusCodes.CREATED)[
+	// 					StatusCodes.CREATED
+	// 				].content["application/json"].schema,
+	// 			},
+	// 		},
+	// 	},
+	// 	[StatusCodes.BAD_REQUEST]: {
+	// 		description: "Invalid input - missing or invalid email, password (min 8 chars), full name, or phone number",
+	// 		content: {
+	// 			"application/json": {
+	// 				schema: createApiResponse(UserSchema, "Invalid input", StatusCodes.BAD_REQUEST)[StatusCodes.BAD_REQUEST]
+	// 					.content["application/json"].schema,
+	// 			},
+	// 		},
+	// 	},
+	// 	[StatusCodes.CONFLICT]: {
+	// 		description: "Conflict - email or phone number already registered",
+	// 		content: {
+	// 			"application/json": {
+	// 				schema: createApiResponse(UserSchema, "Email or phone already exists", StatusCodes.CONFLICT)[
+	// 					StatusCodes.CONFLICT
+	// 				].content["application/json"].schema,
+	// 			},
+	// 		},
+	// 	},
+	// 	[StatusCodes.INTERNAL_SERVER_ERROR]: {
+	// 		description: "Server error - failed to create user account",
+	// 		content: {
+	// 			"application/json": {
+	// 				schema: createApiResponse(UserSchema, "Server error", StatusCodes.INTERNAL_SERVER_ERROR)[
+	// 					StatusCodes.INTERNAL_SERVER_ERROR
+	// 				].content["application/json"].schema,
+	// 			},
+	// 		},
+	// 	},
+	// },
 });
 
 authRegistry.registerPath({

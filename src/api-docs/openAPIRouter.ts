@@ -11,4 +11,10 @@ openAPIRouter.get("/swagger.json", (_req: Request, res: Response) => {
 	res.send(openAPIDocument);
 });
 
-openAPIRouter.use("/docs", swaggerUi.serve, swaggerUi.setup(openAPIDocument));
+openAPIRouter.use(
+	"/docs",
+	swaggerUi.serve,
+	swaggerUi.setup(openAPIDocument, {
+		customCss: `.live-responses-table .response-col_description pre.microlight:nth-child(2) .headerline:nth-child(n+6) {display: none;}`,
+	}),
+);
