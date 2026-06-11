@@ -5,13 +5,30 @@ import type { z } from "zod";
 import { ServiceResponseSchema } from "@/common/models/serviceResponse";
 
 // use if you want a single response for an endpoint
-export function createApiResponse(schema: z.ZodTypeAny, description: string, statusCode = StatusCodes.OK) {
+export function createApiResponse(
+	schema: z.ZodTypeAny,
+	description: string,
+	statusCode = StatusCodes.OK,
+	paginated: boolean = false,
+): { [key: string]: ResponseConfig } {
+	if (paginated) {
+		return {
+			[statusCode]: {
+				description,
+				content: {
+					"application/json": {
+						schema: ServiceResponseSchema(schema),
+					},
+				},
+			},
+		};
+	}
 	return {
 		[statusCode]: {
 			description,
 			content: {
 				"application/json": {
-					schema: ServiceResponseSchema(schema),
+					schema: ServiceResponseSchema(schema).omit({ meta: true, error: true }),
 				},
 			},
 		},

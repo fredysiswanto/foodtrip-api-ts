@@ -1,4 +1,5 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
+import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
 import { z } from "zod";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { commonValidations } from "@/common/utils/commonValidation";
@@ -67,7 +68,7 @@ clientDishRegistry.registerPath({
 			},
 		},
 	],
-	responses: createApiResponse(z.array(DishSchema), "Dishes retrieved successfully"),
+	responses: createApiResponse(z.array(DishSchema), "Dishes retrieved successfully", StatusCodes.OK, true),
 });
 
 clientDishRegistry.registerPath({
@@ -137,7 +138,7 @@ dishRegistry.registerPath({
 			},
 		},
 	],
-	responses: createApiResponse(z.array(DishSchema), "Dishes retrieved successfully"),
+	responses: createApiResponse(z.array(DishSchema), "Dishes retrieved successfully", StatusCodes.OK, true),
 });
 
 // GET /dishes/:id - Get dish by ID
@@ -166,7 +167,7 @@ dishRegistry.registerPath({
 			},
 		},
 	},
-	responses: createApiResponse(DishSchema, "Dish created successfully"),
+	responses: createApiResponse(DishSchema, "Dish created successfully", StatusCodes.CREATED),
 });
 
 // PATCH /dishes/:id - Update dish (Admin only)

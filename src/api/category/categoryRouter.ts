@@ -1,81 +1,12 @@
-import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { type Router } from "express";
 import { z } from "zod";
-
-import { CategorySchema, CreateCategorySchema, UpdateCategorySchema } from "@/api/category/category.dto";
+import { CreateCategorySchema, UpdateCategorySchema } from "@/api/category/category.dto";
 import { categoryController } from "@/api/category/categoryController";
-import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { adminAuthMiddleware } from "@/common/middleware/adminAuthMiddleware";
 import { commonValidations } from "@/common/utils/commonValidation";
 import { validateRequest } from "@/common/utils/httpHandlers";
 
-export const categoryRegistry = new OpenAPIRegistry();
 export const categoryRouter: Router = express.Router();
-
-categoryRegistry.register("Category", CategorySchema);
-
-// GET /categories - Get all categories
-categoryRegistry.registerPath({
-	method: "get",
-	path: "/api/admin/categories",
-	tags: ["Category"],
-	responses: createApiResponse(z.array(CategorySchema), "Categories retrieved successfully"),
-});
-
-// GET /categories/:id - Get category by ID
-categoryRegistry.registerPath({
-	method: "get",
-	path: "/api/admin/categories/{id}",
-	tags: ["Category"],
-	request: { params: z.object({ id: commonValidations.id }) },
-	responses: createApiResponse(CategorySchema, "Category retrieved successfully"),
-});
-
-// POST /categories - Create new category (Admin only)
-categoryRegistry.registerPath({
-	method: "post",
-	path: "/api/admin/categories",
-	tags: ["Category"],
-	request: {
-		body: {
-			description: "Create category payload",
-			content: {
-				"application/json": {
-					schema: CreateCategorySchema,
-				},
-			},
-		},
-	},
-	responses: createApiResponse(CategorySchema, "Category created successfully"),
-});
-
-// PATCH /categories/:id - Update category (Admin only)
-categoryRegistry.registerPath({
-	method: "patch",
-	path: "/api/admin/categories/{id}",
-	tags: ["Category"],
-	request: {
-		params: z.object({ id: commonValidations.id }),
-		body: {
-			description: "Update category payload",
-			content: {
-				"application/json": {
-					schema: UpdateCategorySchema,
-				},
-			},
-		},
-	},
-	responses: createApiResponse(CategorySchema, "Category updated successfully"),
-});
-
-// DELETE /categories/:id - Delete category (Admin only)
-categoryRegistry.registerPath({
-	method: "delete",
-	path: "/api/admin/categories/{id}",
-	tags: ["Category"],
-	request: { params: z.object({ id: commonValidations.id }) },
-	responses: createApiResponse(z.null(), "Category deleted successfully"),
-});
 
 // Routes
 categoryRouter.get("/", categoryController.getCategories);

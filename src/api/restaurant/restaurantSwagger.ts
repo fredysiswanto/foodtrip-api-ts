@@ -1,4 +1,5 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
+import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
 import { z } from "zod";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { commonValidations } from "@/common/utils/commonValidation";
@@ -67,7 +68,7 @@ clientRestaurantRegistry.registerPath({
 			},
 		},
 	],
-	responses: createApiResponse(z.array(RestaurantSchema), "Restaurants retrieved successfully"),
+	responses: createApiResponse(z.array(RestaurantSchema), "Restaurants retrieved successfully", StatusCodes.OK, true),
 });
 
 clientRestaurantRegistry.registerPath({
@@ -88,7 +89,7 @@ restaurantRegistry.registerPath({
 	path: basePath,
 	tags: ["Restaurant"],
 	summary: "Get all restaurants",
-	responses: createApiResponse(z.array(RestaurantSchema), "Restaurants retrieved successfully"),
+	responses: createApiResponse(z.array(RestaurantSchema), "Restaurants retrieved successfully", StatusCodes.OK, true),
 });
 
 // GET /restaurants/:restaurantId - Get restaurant by ID
@@ -117,7 +118,7 @@ restaurantRegistry.registerPath({
 			},
 		},
 	},
-	responses: createApiResponse(RestaurantSchema, "Restaurant created successfully"),
+	responses: createApiResponse(RestaurantSchema, "Restaurant created successfully", StatusCodes.CREATED),
 });
 
 // PATCH /restaurants/:restaurantId - Update restaurant (Admin only)

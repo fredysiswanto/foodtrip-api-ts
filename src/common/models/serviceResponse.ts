@@ -4,10 +4,10 @@ import type { PaginationMeta } from "../utils/paginationHelper";
 
 export type ServiceResponseType<T = null> = {
 	success: boolean;
+	statusCode: number;
 	message: string;
 	data: T;
 	meta?: PaginationMeta;
-	statusCode: number;
 	error?: string;
 };
 
@@ -38,9 +38,9 @@ export class ServiceResponse<T = null> {
 
 	static paginatedSuccess<T>(
 		message: string,
+		statusCode: number = StatusCodes.OK,
 		responseObject: T,
 		meta: PaginationMeta,
-		statusCode: number = StatusCodes.OK,
 	) {
 		const serviceResponse = new ServiceResponse(true, message, responseObject, statusCode);
 		serviceResponse.meta = meta;
@@ -63,10 +63,9 @@ export class ServiceResponse<T = null> {
 export const ServiceResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
 	z.object({
 		success: z.boolean(),
+		statusCode: z.number(),
 		message: z.string(),
 		data: dataSchema.optional(),
-		statusCode: z.number(),
-		error: z.string().optional(),
 		meta: z
 			.object({
 				page: z.number(),
@@ -77,4 +76,5 @@ export const ServiceResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
 				nextPage: z.number().nullable(),
 			})
 			.optional(),
+		error: z.string().optional(),
 	});
