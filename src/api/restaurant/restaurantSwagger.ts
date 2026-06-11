@@ -67,7 +67,6 @@ clientRestaurantRegistry.registerPath({
 			},
 		},
 	],
-
 	responses: createApiResponse(z.array(RestaurantSchema), "Restaurants retrieved successfully"),
 });
 
@@ -75,9 +74,10 @@ clientRestaurantRegistry.registerPath({
 	method: "get",
 	path: `${clientBasePath}/{restaurantId}`,
 	tags: ["Client Restaurant"],
+	request: { params: z.object({ restaurantId: commonValidations.id }) },
 	summary: "Get restaurant by ID",
 	description: "Return single data Restaurant.",
-	responses: createApiResponse(z.array(RestaurantSchema), "Restaurants retrieved successfully"),
+	responses: createApiResponse(RestaurantSchema, "Restaurant retrieved successfully"),
 });
 
 // Admin APIs

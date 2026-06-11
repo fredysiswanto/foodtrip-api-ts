@@ -2,7 +2,7 @@ import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-open
 import { authRegistry } from "@/api/auth/authRouter";
 import { cartRegistry } from "@/api/cart/cartRouter";
 import { categoryRegistry } from "@/api/category/categoryRouter";
-import { dishRegistry } from "@/api/dish/dishRouter";
+import { clientDishRegistry, dishRegistry } from "@/api/dish/dishSwagger";
 import { healthCheckRegistry } from "@/api/healthCheck/healthCheckRouter";
 import { orderRegistry } from "@/api/order/orderRouter";
 import { clientRestaurantRegistry, restaurantRegistry } from "@/api/restaurant/restaurantSwagger";
@@ -17,6 +17,7 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		authRegistry,
 		// Client APIs
 		clientRestaurantRegistry,
+		clientDishRegistry,
 		// Admin APIs
 		userRegistry,
 		categoryRegistry,
