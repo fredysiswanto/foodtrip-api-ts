@@ -24,10 +24,10 @@ clientCategoryRegistry.registerPath({
 
 clientCategoryRegistry.registerPath({
 	method: "get",
-	path: `${clientBasePath}/{id}`,
+	path: `${clientBasePath}/{categoryId}`,
 	tags: ["Client Category"],
 	summary: "Get category by ID",
-	request: { params: z.object({ id: commonValidations.id }) },
+	request: { params: z.object({ categoryId: commonValidations.id }) },
 	responses: createApiResponse(CategorySchema, "Category retrieved successfully"),
 });
 
@@ -46,10 +46,10 @@ categoryRegistry.registerPath({
 // GET /categories/:id - Get category by ID
 categoryRegistry.registerPath({
 	method: "get",
-	path: `${adminBasePath}/{id}`,
+	path: `${adminBasePath}/{categoryId}`,
 	tags: ["Category"],
 	summary: "Get category by ID",
-	request: { params: z.object({ id: commonValidations.id }) },
+	request: { params: z.object({ categoryId: commonValidations.id }) },
 	responses: createApiResponse(CategorySchema, "Category retrieved successfully"),
 });
 
@@ -75,11 +75,11 @@ categoryRegistry.registerPath({
 // PATCH /categories/:id - Update category (Admin only)
 categoryRegistry.registerPath({
 	method: "patch",
-	path: `${adminBasePath}/{id}`,
+	path: `${adminBasePath}/{categoryId}`,
 	tags: ["Category"],
 	summary: "Update category",
 	request: {
-		params: z.object({ id: commonValidations.id }),
+		params: z.object({ categoryId: commonValidations.id }),
 		body: {
 			description: "Update category payload",
 			content: {
@@ -95,9 +95,9 @@ categoryRegistry.registerPath({
 // DELETE /categories/:id - Delete category (Admin only)
 categoryRegistry.registerPath({
 	method: "delete",
-	path: `${adminBasePath}/{id}`,
+	path: `${adminBasePath}/{categoryId}`,
 	tags: ["Category"],
 	summary: "Delete category",
-	request: { params: z.object({ id: commonValidations.id }) },
+	request: { params: z.object({ categoryId: commonValidations.id }) },
 	responses: createApiResponse(z.null(), "Category deleted successfully"),
 });
