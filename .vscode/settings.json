@@ -16,9 +16,7 @@
 	"[typescript]": {
 		"editor.defaultFormatter": "biomejs.biome"
 	},
-	"vcs": {
-		"enabled": true,
-		"clientKind": "git",
-		"useIgnoreFile": true
-	}
+	"github.copilot.chat.commitMessageGeneration.instructions": [
+		{ "file": ".github/instructions/commit-instructions.md" }
+	]
 }
