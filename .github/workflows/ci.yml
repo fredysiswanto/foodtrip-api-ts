@@ -128,7 +128,7 @@ jobs:
           tar -tzf foodtrip-release.tar.gz
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: foodtrip-api-ts-release
           path: foodtrip-release.tar.gz
@@ -174,7 +174,7 @@ jobs:
           key: ${{ secrets.VPS_PRIVATE_KEY }}
           port: ${{ secrets.VPS_SSH_PORT || '22' }}
           source: "scripts/deploy.sh"
-          target: "${{ env.DEPLOY_PATH }}"
+          target: ${{ env.DEPLOY_PATH }}
 
       - name: Deploy Application
         uses: appleboy/ssh-action@v1.2.0
@@ -185,10 +185,10 @@ jobs:
           port: ${{ secrets.VPS_SSH_PORT || '22' }}
           script: |
             chmod +x ${{ env.DEPLOY_PATH }}/scripts/deploy.sh
-
+            echo "Deploying application using script at ${{ env.DEPLOY_PATH }}/scripts/deploy.sh"
             bash ${{ env.DEPLOY_PATH }}/scripts/deploy.sh \
               /tmp/foodtrip-release.tar.gz \
-              "${{ env.DEPLOY_PATH }}"
+              ${{ env.DEPLOY_PATH }}
 
       - name: Health Check
         uses: appleboy/ssh-action@v1.2.0
