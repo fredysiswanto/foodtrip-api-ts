@@ -106,12 +106,8 @@ jobs:
 
           cp package.json release/
           cp pnpm-lock.yaml release/
+          cp prisma.config.ts release/
           cp ecosystem.config.cjs release/
-
-          if [ -f prisma.config.ts ]; then
-            cp prisma.config.ts release/
-          fi
-
           cp -r prisma release/
           cp -r dist release/
 
@@ -128,7 +124,7 @@ jobs:
           tar -tzf foodtrip-release.tar.gz
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: foodtrip-api-ts-release
           path: foodtrip-release.tar.gz
@@ -151,7 +147,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
       - name: Download Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: foodtrip-api-ts-release
           path: .
