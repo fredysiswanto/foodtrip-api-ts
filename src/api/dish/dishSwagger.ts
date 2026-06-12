@@ -73,9 +73,9 @@ clientDishRegistry.registerPath({
 
 clientDishRegistry.registerPath({
 	method: "get",
-	path: `${clientBasePath}/{id}`,
+	path: `${clientBasePath}/{dishId}`,
 	tags: ["Client Dish"],
-	request: { params: z.object({ id: commonValidations.id }) },
+	request: { params: z.object({ dishId: commonValidations.id }) },
 	summary: "Get dish by ID",
 	responses: createApiResponse(DishSchema, "Dish retrieved successfully"),
 });
@@ -144,9 +144,9 @@ dishRegistry.registerPath({
 // GET /dishes/:id - Get dish by ID
 dishRegistry.registerPath({
 	method: "get",
-	path: `${adminBasePath}/{id}`,
+	path: `${adminBasePath}/{dishId}`,
 	tags: ["Dish"],
-	request: { params: z.object({ id: commonValidations.id }) },
+	request: { params: z.object({ dishId: commonValidations.id }) },
 	summary: "Get dish by ID",
 	responses: createApiResponse(DishSchema, "Dish retrieved successfully"),
 });
@@ -173,11 +173,11 @@ dishRegistry.registerPath({
 // PATCH /dishes/:id - Update dish (Admin only)
 dishRegistry.registerPath({
 	method: "patch",
-	path: `${adminBasePath}/{id}`,
+	path: `${adminBasePath}/{dishId}`,
 	tags: ["Dish"],
 	summary: "Update dish",
 	request: {
-		params: z.object({ id: commonValidations.id }),
+		params: z.object({ dishId: commonValidations.id }),
 		body: {
 			description: "Update dish payload",
 			content: {
@@ -193,9 +193,9 @@ dishRegistry.registerPath({
 // DELETE /dishes/:id - Delete dish (Admin only)
 dishRegistry.registerPath({
 	method: "delete",
-	path: `${adminBasePath}/{id}`,
+	path: `${adminBasePath}/{dishId}`,
 	tags: ["Dish"],
 	summary: "Delete dish",
-	request: { params: z.object({ id: commonValidations.id }) },
+	request: { params: z.object({ dishId: commonValidations.id }) },
 	responses: createApiResponse(z.null(), "Dish deleted successfully"),
 });
