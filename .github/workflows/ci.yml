@@ -136,6 +136,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    environment:
+      name: env-foodtrip-ts
+
     needs:
       - quality
       - typecheck
