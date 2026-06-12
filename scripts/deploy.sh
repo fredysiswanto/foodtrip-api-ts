@@ -26,7 +26,7 @@ ln -sfn "$SHARED_DIR/.env" "$RELEASE_DIR/.env"
 
 cd "$RELEASE_DIR"
 
-pnpm install --prod --frozen-lockfile
+pnpm install --prod --frozen-lockfile --ignore-scripts
 
 pnpm exec prisma generate
 
