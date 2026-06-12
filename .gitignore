@@ -27,5 +27,5 @@ dist-ssr
 src/generated/prisma
 
 /public/uploads
-
+.husky/_
 
