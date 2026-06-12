@@ -11,6 +11,14 @@ export type ServiceResponseType<T = null> = {
 	error?: string;
 };
 
+// type response errors
+export type ServiceResponseErrorType = {
+	success: false;
+	statusCode: number;
+	message: string;
+	data: null;
+};
+
 export class ServiceResponse<T = null> {
 	readonly success: boolean;
 	readonly message: string;
@@ -78,3 +86,10 @@ export const ServiceResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
 			.optional(),
 		error: z.string().optional(),
 	});
+
+export const ServicesResponseErrorSchema = z.object({
+	success: z.literal(false),
+	statusCode: z.number(),
+	message: z.string(),
+	data: z.null(),
+});

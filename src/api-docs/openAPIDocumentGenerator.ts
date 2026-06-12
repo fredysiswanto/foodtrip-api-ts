@@ -1,5 +1,5 @@
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
-import { authRegistry } from "@/api/auth/authRouter";
+import { authRegistry } from "@/api/auth/authSwagger";
 
 import { cartRegistry, clientCartRegistry } from "@/api/cart/cartSwagger";
 import { categoryRegistry, clientCategoryRegistry } from "@/api/category/categorySwagger";
