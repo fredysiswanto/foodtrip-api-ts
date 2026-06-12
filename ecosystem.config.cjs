@@ -2,7 +2,7 @@ module.exports = {
 	apps: [
 		{
 			name: "foodtrip-api-ts",
-			cwd: "/home/ubuntu/foodtrip-api-ts/current",
+			cwd: "/home/ubuntu/foodtrip-api-ts",
 			script: "./dist/index.js",
 			instances: "1",
 			exec_mode: "fork",
