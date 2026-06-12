@@ -30,6 +30,8 @@ pnpm install --prod --frozen-lockfile --ignore-scripts
 
 pnpm exec prisma generate
 
+pnpm prisma migrate deploy
+
 ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"
 
 cd "$CURRENT_LINK"

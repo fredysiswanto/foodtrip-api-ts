@@ -1,0 +1,46 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: foodtrip-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_INITDB_SKIP_TZINFO: "yes"
+    volumes:
+      - /tmp/data_d/dbs/mysql/foodtrip:/var/lib/mysql
+      #- ./foodtrip.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    command:
+      - --authentication-policy=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --ssl=0
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 10s
+      timeout: 20s
+      retries: 5
+      start_period: 60s
+    networks:
+      - app-network
+    cap_add:
+      - SYS_NICE
+    cap_drop:
+      - NET_RAW
+
+networks:
+  app-network:
+    driver: bridge
