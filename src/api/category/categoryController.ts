@@ -2,7 +2,12 @@ import type { Request, RequestHandler, Response } from "express";
 import type { ServiceResponseType } from "@/common/models/serviceResponse";
 import { validateData } from "@/common/utils/commonValidation";
 import type { Category } from "@/generated/prisma/browser";
-import { CreateCategorySchema, UpdateCategorySchema } from "./category.dto";
+import {
+	CreateCategoryEnvSchema,
+	CreateCategorySchema,
+	type PlaywrightDemo,
+	UpdateCategorySchema,
+} from "./category.dto";
 import { CategoryService } from "./categoryService";
 
 export class CategoryController {
@@ -41,6 +46,19 @@ export class CategoryController {
 			const validatedData = validateData(CreateCategorySchema, req.body);
 
 			const serviceResponse = await this.categoryService.create(validatedData);
+			res.status(serviceResponse.statusCode).send(serviceResponse);
+		} catch (error) {
+			this.handleValidationErrorOrPanic(res, error);
+		}
+	};
+	public createCategoryEnv: RequestHandler = async (
+		req: Request,
+		res: Response<ServiceResponseType<Pick<PlaywrightDemo, "id" | "name"> | null>>,
+	) => {
+		try {
+			const validatedData = validateData(CreateCategoryEnvSchema, req.body);
+
+			const serviceResponse = await this.categoryService.createEnv(validatedData);
 			res.status(serviceResponse.statusCode).send(serviceResponse);
 		} catch (error) {
 			this.handleValidationErrorOrPanic(res, error);

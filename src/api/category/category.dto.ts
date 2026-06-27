@@ -6,6 +6,8 @@ import type { Prisma } from "@/generated/prisma/client";
 extendZodWithOpenApi(z);
 
 export type Category = Prisma.CategoryModel;
+export type PlaywrightDemo = Prisma.PlaywrightDemoModel;
+
 export const CategorySchema = z.object({
 	id: z.string().uuid(),
 	slug: z.string(),
@@ -24,4 +26,10 @@ export const CreateCategorySchema = z.object({
 	description: z.string().nullable(),
 });
 
+export const CreateCategoryEnvSchema = z.object({
+	name: z.string(),
+	description: z.string(),
+});
+
+export type CreateCategoryEnvInput = z.infer<typeof CreateCategoryEnvSchema>;
 export const UpdateCategorySchema = CreateCategorySchema.partial();

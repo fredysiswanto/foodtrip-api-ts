@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes"; // Cleaned up import target
 import { ServiceResponse } from "@/common/models/serviceResponse";
-import type { Category } from "@/generated/prisma/browser";
+import type { Category, PlaywrightDemo } from "@/generated/prisma/browser";
 import { CategoryRepository } from "./categoryRepository";
 
 export class CategoryService {
@@ -51,6 +51,27 @@ export class CategoryService {
 			}
 
 			const createdCategory = await this.categoryRepository.create(data);
+			return ServiceResponse.success("Category created successfully.", createdCategory, StatusCodes.CREATED);
+		} catch (error) {
+			// Handling database race conditions (Prisma unique constraint code: P2002)
+			// if (error?.code === "P2002" || error?.message?.includes("unique constraint")) {
+			// 	return ServiceResponse.failure("Category with this slug already exists.", null, StatusCodes.CONFLICT, );
+			// }
+			return ServiceResponse.failure(
+				`Unable to create category: ${error instanceof Error ? error.message : "Unknown error"}`,
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async createEnv(
+		data: Pick<PlaywrightDemo, "name" | "description">,
+	): Promise<ServiceResponse<Pick<PlaywrightDemo, "id" | "name"> | null>> {
+		try {
+			// Early business logic validation check
+
+			const createdCategory = await this.categoryRepository.createEnv(data);
 			return ServiceResponse.success("Category created successfully.", createdCategory, StatusCodes.CREATED);
 		} catch (error) {
 			// Handling database race conditions (Prisma unique constraint code: P2002)

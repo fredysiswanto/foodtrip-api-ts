@@ -1,5 +1,5 @@
 import { prisma } from "@/utils/prismaClient";
-import type { Category } from "./category.dto";
+import type { Category, PlaywrightDemo } from "./category.dto";
 
 export class CategoryRepository {
 	async findBySlug(slug: string): Promise<Category | null> {
@@ -20,6 +20,13 @@ export class CategoryRepository {
 
 	async create(data: Pick<Category, "name" | "description" | "slug">): Promise<Pick<Category, "id" | "name">> {
 		return prisma.category.create({
+			select: { id: true, name: true },
+			data,
+		});
+	}
+
+	async createEnv(data: Pick<PlaywrightDemo, "name" | "description">): Promise<Pick<PlaywrightDemo, "id" | "name">> {
+		return prisma.playwrightDemo.create({
 			select: { id: true, name: true },
 			data,
 		});

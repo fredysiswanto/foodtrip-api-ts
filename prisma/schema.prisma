@@ -356,3 +356,10 @@ model AuditLog {
   @@index([entityType])
   @@index([entityId])
 }
+
+
+model PlaywrightDemo {
+  id String @id @default(uuid())
+  name String
+  description String @db.Text 
+}
