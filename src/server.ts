@@ -35,6 +35,9 @@ app.use("/api/admin", adminRouter);
 app.use("/api", clientRouter);
 
 app.use("/api/uploads/images", express.static("public/uploads"));
+app.get("/", (_req, res) => {
+	res.json({ message: "Welcome to the Food Trip API" });
+});
 
 // Swagger UI
 app.use(openAPIRouter);
