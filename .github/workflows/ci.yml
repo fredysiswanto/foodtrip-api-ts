@@ -71,19 +71,6 @@ jobs:
       - name: Run Tests
         run: pnpm test
 
-      - name: Debug VPS_HOST Base64
-        run: |
-          echo "VPS_HOST in Base64:"
-          echo "${{ secrets.VPS_HOST }}" | base64
-          echo "VPS_HOST in plaintext:"
-          echo "${{ secrets.VPS_HOST }}" | base64
-          echo "VPS_USER:"
-          echo "${{ secrets.VPS_USER }}" | base64
-          echo "VPS_SSH_PORT:"
-          echo "${{ secrets.VPS_SSH_PORT || '22' }}" | base64
-          echo "DEPLOY_PATH:"
-          echo "${{ env.DEPLOY_PATH }}" | base64
-
   build:
     name: Build and Package
 
