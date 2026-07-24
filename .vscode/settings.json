@@ -18,5 +18,8 @@
 	},
 	"github.copilot.chat.commitMessageGeneration.instructions": [
 		{ "file": ".github/instructions/commit-instructions.md" }
-	]
+	],
+	"files.exclude": {
+		"**/.git": false
+	}
 }
